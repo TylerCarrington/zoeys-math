@@ -49,7 +49,7 @@ ul {
 /* MathTimer.css */
 body {
   font-family: "Arial", sans-serif;
-  background: #f9fafb;
+  background: #bfeff5;
   margin: 0;
   padding: 0;
 }
@@ -66,7 +66,7 @@ body {
 
 .title {
   font-size: 2.5rem;
-  color: #4a5568;
+  color: #9eb3ff;
 }
 
 .timer {
@@ -150,4 +150,54 @@ body {
 
 .incorrect {
   color: #e53e3e;
+}
+
+.toggle-switch {
+  display: inline-flex;
+  align-items: center;
+  margin: 10px;
+  cursor: pointer;
+  position: relative;
+}
+
+.toggle-switch input {
+  display: none;
+}
+
+.toggle-switch .slider {
+  position: relative;
+  width: 40px;
+  height: 20px;
+  background-color: #ccc;
+  border-radius: 15px;
+  transition: background-color 0.3s;
+}
+
+.toggle-switch input:checked + .slider {
+  background-color: #4caf50;
+}
+
+.toggle-switch .slider:after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s;
+}
+
+.toggle-switch input:checked + .slider:after {
+  transform: translateX(20px);
+}
+
+.operator-label {
+  margin-left: 10px;
+  font-size: 16px;
+}
+
+.operator-selection {
+  margin-bottom: 20px;
 }

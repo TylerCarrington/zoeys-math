@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 
 // Function to generate a random math problem
-const generateMathProblem = () => {
+const generateMathProblem = (selectedOperators) => {
   const num1 = Math.floor(Math.random() * 12) + 1;
   const num2 = Math.floor(Math.random() * 12) + 1;
-  const operations = ["+", "-", "*", "/"];
+  const operations =
+    selectedOperators.length > 0 ? selectedOperators : ["+", "-", "*", "/"];
   const operation = operations[Math.floor(Math.random() * operations.length)];
 
   let problem = "";
@@ -22,10 +23,10 @@ const generateMathProblem = () => {
       problem = `${num2} - ${num1}`;
       answer = num2 - num1;
     }
-  } else if (operation === "*") {
+  } else if (operation === "x") {
     problem = `${num1} x ${num2}`;
     answer = num1 * num2;
-  } else if (operation === "/") {
+  } else if (operation === "÷") {
     const possibleResults = [];
     for (let i = 1; i <= 12; i++) {
       if (num1 % i === 0) {
@@ -50,6 +51,14 @@ const MathTimer = () => {
   const [feedback, setFeedback] = useState("");
   const [correctCount, setCorrectCount] = useState(0);
   const [incorrectCount, setIncorrectCount] = useState(0);
+  const [selectedOperators, setSelectedOperators] = useState([
+    "+",
+    "-",
+    "x",
+    "÷",
+  ]);
+  const [edittingName, setEdittingName] = useState(false);
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
     let interval;
@@ -69,7 +78,7 @@ const MathTimer = () => {
   const startTimer = useCallback(() => {
     setIsTimerRunning(true);
     setTimer(60);
-    const { problem, answer } = generateMathProblem();
+    const { problem, answer } = generateMathProblem(selectedOperators);
     setProblem(problem);
     setAnswer(answer);
     setUserAnswer("");
@@ -91,7 +100,8 @@ const MathTimer = () => {
       setIncorrectCount((prev) => prev + 1);
     }
 
-    const { problem: newProblem, answer: newAnswer } = generateMathProblem();
+    const { problem: newProblem, answer: newAnswer } =
+      generateMathProblem(selectedOperators);
     setProblem(newProblem);
     setAnswer(newAnswer);
     setUserAnswer("");
@@ -103,12 +113,66 @@ const MathTimer = () => {
     }
   };
 
+  const handleOperatorToggle = (operator) => {
+    setSelectedOperators((prev) =>
+      prev.includes(operator)
+        ? prev.filter((op) => op !== operator)
+        : [...prev, operator]
+    );
+  };
+
+  const handleNameChange = (e) => {
+    setUserName(e.target.value);
+  };
+
   return (
     <div className="container">
-      <h1 className="title">Zoey's Math Timer</h1>
+      <div className="title-container">
+        <h1 className="title">
+          {userName ? `${userName}'s Math Timer` : "Math Timer"}
+        </h1>
+        {edittingName ? (
+          <div>
+            <input
+              type="text"
+              className="name-input"
+              placeholder="Enter your name"
+              style={{ height: 40 }}
+              value={userName}
+              onChange={handleNameChange}
+            />
+            <button
+              className="submit-button"
+              onClick={() => setEdittingName(false)}
+              style={{ marginLeft: 10 }}
+              disabled={timer === 0}
+            >
+              Save
+            </button>
+          </div>
+        ) : (
+          <a href="#" onClick={() => setEdittingName(true)}>
+            Edit Name
+          </a>
+        )}
+      </div>
       <p className="timer">
         Time left: <span>{timer}s</span>
       </p>
+      <div className="operator-selection">
+        <h3>Select Operators:</h3>
+        {["+", "-", "x", "÷"].map((op) => (
+          <label className="toggle-switch" key={op}>
+            <input
+              type="checkbox"
+              checked={selectedOperators.includes(op)}
+              onChange={() => handleOperatorToggle(op)}
+            />
+            <span className="slider"></span>
+            <span className="operator-label">{op}</span>
+          </label>
+        ))}
+      </div>
       <button
         className="start-button"
         onClick={startTimer}
