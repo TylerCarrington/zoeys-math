@@ -1,4 +1,4 @@
-import MathTimer from "../MathTimer";
+import MathTimer from "./MathTimer";
 
 function Greeting({ name }) {
   return <h1>Hello, {name}</h1>;
