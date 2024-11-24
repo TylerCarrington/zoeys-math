@@ -27,23 +27,16 @@ const generateMathProblem = (selectedOperators) => {
     problem = `${num1} x ${num2}`;
     answer = num1 * num2;
   } else if (operation === "÷") {
-    const possibleResults = [];
-    for (let i = 1; i <= 12; i++) {
-      if (num1 % i === 0) {
-        possibleResults.push(i);
-      }
-    }
-    const divNum2 =
-      possibleResults[Math.floor(Math.random() * possibleResults.length)];
-    problem = `${num1} ÷ ${divNum2}`;
-    answer = num1 / divNum2;
+    const largerNum = num1 * num2;
+    problem = `${largerNum} ÷ ${num1}`;
+    answer = num2;
   }
 
   return { problem, answer };
 };
 
-const MathTimer = () => {
-  const [timer, setTimer] = useState(60);
+const MathTimer = ({ setEdittingName, userName, onSessionEnd }) => {
+  const [timer, setTimer] = useState(10);
   const [problem, setProblem] = useState("");
   const [answer, setAnswer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -57,8 +50,8 @@ const MathTimer = () => {
     "x",
     "÷",
   ]);
-  const [edittingName, setEdittingName] = useState(false);
-  const [userName, setUserName] = useState("");
+  const [sessionCoins, setSessionCoins] = useState(0);
+  const [sessionTickets, setSessionTickets] = useState(0);
 
   useEffect(() => {
     let interval;
@@ -67,9 +60,13 @@ const MathTimer = () => {
       interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
     } else if (timer === 0) {
       setFeedback(
-        `Time is up! Your score: ${correctCount} correct, ${incorrectCount} incorrect.`
+        `Time's up! Coins (🪙) earned: ${sessionCoins}, Tickets (🎟️) earned: ${sessionTickets}`
       );
-      setIsTimerRunning(false);
+
+      if (isTimerRunning) {
+        onSessionEnd(sessionCoins, sessionTickets);
+        setIsTimerRunning(false);
+      }
     }
 
     return () => clearInterval(interval);
@@ -77,7 +74,7 @@ const MathTimer = () => {
 
   const startTimer = useCallback(() => {
     setIsTimerRunning(true);
-    setTimer(60);
+    setTimer(10);
     const { problem, answer } = generateMathProblem(selectedOperators);
     setProblem(problem);
     setAnswer(answer);
@@ -89,12 +86,18 @@ const MathTimer = () => {
 
   const handleAnswerChange = (e) => {
     setUserAnswer(e.target.value);
+    generateMathProblem(selectedOperators);
   };
 
   const handleSubmitAnswer = () => {
     if (parseInt(userAnswer) === answer) {
       setFeedback("Correct!");
       setCorrectCount((prev) => prev + 1);
+      if (problem.includes("+") || problem.includes("-")) {
+        setSessionCoins((prev) => prev + 1);
+      } else if (problem.includes("x") || problem.includes("÷")) {
+        setSessionTickets((prev) => prev + 1);
+      }
     } else {
       setFeedback(`Incorrect! The correct answer was: ${answer}`);
       setIncorrectCount((prev) => prev + 1);
@@ -121,57 +124,56 @@ const MathTimer = () => {
     );
   };
 
-  const handleNameChange = (e) => {
-    setUserName(e.target.value);
-  };
-
   return (
     <div className="container">
       <div className="title-container">
         <h1 className="title">
           {userName ? `${userName}'s Math Timer` : "Math Timer"}
         </h1>
-        {edittingName ? (
-          <div>
-            <input
-              type="text"
-              className="name-input"
-              placeholder="Enter your name"
-              style={{ height: 40 }}
-              value={userName}
-              onChange={handleNameChange}
-            />
-            <button
-              className="submit-button"
-              onClick={() => setEdittingName(false)}
-              style={{ marginLeft: 10 }}
-              disabled={timer === 0}
-            >
-              Save
-            </button>
-          </div>
-        ) : (
-          <a href="#" onClick={() => setEdittingName(true)}>
-            Edit Name
-          </a>
-        )}
+
+        <a href="#" onClick={() => setEdittingName(true)}>
+          Edit Name
+        </a>
       </div>
       <p className="timer">
         Time left: <span>{timer}s</span>
       </p>
       <div className="operator-selection">
         <h3>Select Operators:</h3>
-        {["+", "-", "x", "÷"].map((op) => (
-          <label className="toggle-switch" key={op}>
-            <input
-              type="checkbox"
-              checked={selectedOperators.includes(op)}
-              onChange={() => handleOperatorToggle(op)}
-            />
-            <span className="slider"></span>
-            <span className="operator-label">{op}</span>
-          </label>
-        ))}
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {"🪙"}
+            <div>
+              {["+", "-"].map((op) => (
+                <label className="toggle-switch" key={op}>
+                  <input
+                    type="checkbox"
+                    checked={selectedOperators.includes(op)}
+                    onChange={() => handleOperatorToggle(op)}
+                  />
+                  <span className="slider"></span>
+                  <span className="operator-label">{op}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            {"🎟️"}
+            <div>
+              {["x", "÷"].map((op) => (
+                <label className="toggle-switch" key={op}>
+                  <input
+                    type="checkbox"
+                    checked={selectedOperators.includes(op)}
+                    onChange={() => handleOperatorToggle(op)}
+                  />
+                  <span className="slider"></span>
+                  <span className="operator-label">{op}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
       <button
         className="start-button"
@@ -208,6 +210,7 @@ const MathTimer = () => {
       {!isTimerRunning && timer === 0 && (
         <div className="score-container">
           <h2>Final Score</h2>
+          {feedback && <p className="feedback">{feedback}</p>}
           <p className="score correct">Correct: {correctCount}</p>
           <p className="score incorrect">Incorrect: {incorrectCount}</p>
         </div>
