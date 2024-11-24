@@ -1,13 +1,14 @@
 import { useState } from "react";
 import MathTimer from "./MathTimer";
 import NameEntry from "./NameEntry";
+import Shop from "./Shop";
 
 function Greeting({ name }) {
   return <h1>Hello, {name}</h1>;
 }
 
 export default function App() {
-  const [edittingName, setEdittingName] = useState(false);
+  const [page, setPage] = useState("game");
   const [userName, setUserName] = useState(
     localStorage.getItem("userName") || ""
   );
@@ -20,23 +21,41 @@ export default function App() {
 
   const handleNameSubmit = (name) => {
     setUserName(name);
-    setEdittingName(false);
+    setPage("game");
+  };
+
+  const persistCoins = (sessionCoins) => {
+    const totalCoins =
+      parseInt(localStorage.getItem("coins") || "0") + sessionCoins;
+
+    localStorage.setItem("coins", totalCoins);
+    setCoins((prev) => prev + sessionCoins);
+  };
+
+  const persistTickets = (sessionTickets) => {
+    const totalTickets =
+      parseInt(localStorage.getItem("tickets") || "0") + sessionTickets;
+    localStorage.setItem("tickets", totalTickets);
+    setTickets((prev) => prev + sessionTickets);
   };
 
   const handleSessionEnd = (sessionCoins, sessionTickets) => {
-    const totalCoins =
-      parseInt(localStorage.getItem("coins") || "0") + sessionCoins;
-    const totalTickets =
-      parseInt(localStorage.getItem("tickets") || "0") + sessionTickets;
-
-    localStorage.setItem("coins", totalCoins);
-    localStorage.setItem("tickets", totalTickets);
-    setCoins((prev) => prev + sessionCoins); // Add session coins to total
-    setTickets((prev) => prev + sessionTickets); // Add session tickets to total
+    persistCoins(sessionCoins);
+    persistTickets(sessionTickets);
   };
 
-  if (!userName || edittingName) {
+  if (!userName || page === "name") {
     return <NameEntry onNameSubmit={handleNameSubmit} />;
+  } else if (page === "shop") {
+    return (
+      <Shop
+        coins={coins}
+        tickets={tickets}
+        setCoins={persistCoins}
+        setTickets={persistTickets}
+        setPage={setPage}
+      />
+    );
   } else {
     return (
       <div>
@@ -49,11 +68,14 @@ export default function App() {
             gap: 8,
           }}
         >
+          <a href="#" onClick={() => setPage("shop")}>
+            Shop
+          </a>
           <span>🪙:{coins}</span>
           <span>🎟️: {tickets}</span>
         </div>
         <MathTimer
-          setEdittingName={setEdittingName}
+          setPage={setPage}
           userName={userName}
           onSessionEnd={handleSessionEnd}
         />
