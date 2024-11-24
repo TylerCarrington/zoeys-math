@@ -15,6 +15,7 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
     "./images/animals/animal7.webp",
     "./images/animals/animal8.webp",
     "./images/animals/animal9.webp",
+    "./images/animals/animal10.png",
     "./images/animals/animal10.webp",
     "./images/animals/animal11.webp",
     "./images/animals/animal12.webp",
@@ -63,6 +64,17 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
     "./images/baseball/baseball25.jpeg",
     "./images/baseball/baseball26.webp",
     "./images/baseball/baseball27.jpeg",
+    "./images/baseball/baseball28.jpeg",
+    "./images/baseball/baseball29.jpeg",
+    "./images/baseball/baseball30.jpeg",
+    "./images/baseball/baseball31.jpeg",
+    "./images/baseball/baseball32.jpeg",
+    "./images/baseball/baseball33.jpeg",
+    "./images/baseball/baseball34.jpeg",
+    "./images/baseball/baseball35.jpeg",
+    "./images/baseball/baseball36.jpeg",
+    "./images/baseball/baseball37.jpeg",
+    "./images/baseball/baseball38.webp",
   ];
 
   // Owned items (fetched from local storage)
