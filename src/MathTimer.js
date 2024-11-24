@@ -36,7 +36,7 @@ const generateMathProblem = (selectedOperators) => {
 };
 
 const MathTimer = ({ setEdittingName, userName, onSessionEnd }) => {
-  const [timer, setTimer] = useState(10);
+  const [timer, setTimer] = useState(60);
   const [problem, setProblem] = useState("");
   const [answer, setAnswer] = useState(0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -74,7 +74,7 @@ const MathTimer = ({ setEdittingName, userName, onSessionEnd }) => {
 
   const startTimer = useCallback(() => {
     setIsTimerRunning(true);
-    setTimer(10);
+    setTimer(60);
     const { problem, answer } = generateMathProblem(selectedOperators);
     setProblem(problem);
     setAnswer(answer);
