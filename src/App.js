@@ -18,6 +18,12 @@ export default function App() {
   const [tickets, setTickets] = useState(
     parseInt(localStorage.getItem("tickets")) || 0
   );
+  const [highCoins, setHighCoins] = useState(
+    parseInt(sessionStorage.getItem("highCoins")) || 0
+  );
+  const [highTickets, setHighTickets] = useState(
+    parseInt(sessionStorage.getItem("highTickets")) || 0
+  );
 
   const handleNameSubmit = (name) => {
     setUserName(name);
@@ -28,6 +34,11 @@ export default function App() {
     const totalCoins =
       parseInt(localStorage.getItem("coins") || "0") + sessionCoins;
 
+    if (sessionCoins > highCoins) {
+      setHighCoins(sessionCoins);
+      sessionStorage.setItem("highCoins");
+    }
+
     localStorage.setItem("coins", totalCoins);
     setCoins((prev) => prev + sessionCoins);
   };
@@ -35,6 +46,11 @@ export default function App() {
   const persistTickets = (sessionTickets) => {
     const totalTickets =
       parseInt(localStorage.getItem("tickets") || "0") + sessionTickets;
+
+    if (sessionTickets > highTickets) {
+      setHighTickets(sessionTickets);
+      sessionStorage.setItem("highTickets");
+    }
     localStorage.setItem("tickets", totalTickets);
     setTickets((prev) => prev + sessionTickets);
   };
@@ -62,7 +78,7 @@ export default function App() {
         <div
           style={{
             position: "absolute",
-            top: 0,
+            top: 10,
             right: 20,
             display: "flex",
             gap: 8,
@@ -73,6 +89,19 @@ export default function App() {
           </a>
           <span>🪙 {coins}</span>
           <span>🎟️ {tickets}</span>
+        </div>
+        <div
+          style={{
+            position: "absolute",
+            top: 10,
+            left: 20,
+            display: "flex",
+            gap: 8,
+          }}
+        >
+          <span>High Score: </span>
+          <span>🪙 {highCoins}</span>
+          <span>🎟️ {highTickets}</span>
         </div>
         <MathTimer
           setPage={setPage}
