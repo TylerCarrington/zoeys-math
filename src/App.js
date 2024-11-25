@@ -71,8 +71,8 @@ export default function App() {
           <a href="#" onClick={() => setPage("shop")}>
             Shop
           </a>
-          <span>🪙:{coins}</span>
-          <span>🎟️: {tickets}</span>
+          <span>🪙 {coins}</span>
+          <span>🎟️ {tickets}</span>
         </div>
         <MathTimer
           setPage={setPage}

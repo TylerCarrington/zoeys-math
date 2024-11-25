@@ -145,10 +145,11 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
                 fontSize: 24,
                 marginLeft: 5,
                 marginTop: 5,
+                transform: "scaleX(-1)",
               }}
               title="Edit Name"
             >
-              🖉
+              ✏️
             </a>
           </div>
         </h1>
