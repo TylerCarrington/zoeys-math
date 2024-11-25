@@ -35,6 +35,7 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
     "./images/animals/husky1.png",
     "./images/animals/husky2.png",
     "./images/animals/husky3.png",
+    "./images/animals/zoey.png",
   ];
   const baseballImages = [
     "./images/baseball/baseball1.jpeg",

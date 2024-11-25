@@ -35,7 +35,7 @@ const generateMathProblem = (selectedOperators) => {
   return { problem, answer };
 };
 
-const MathTimer = ({ setEdittingName, userName, onSessionEnd }) => {
+const MathTimer = ({ userName, onSessionEnd, setPage }) => {
   const [timer, setTimer] = useState(60);
   const [problem, setProblem] = useState("");
   const [answer, setAnswer] = useState(0);
@@ -116,11 +116,11 @@ const MathTimer = ({ setEdittingName, userName, onSessionEnd }) => {
     }
   };
 
-  const handleOperatorToggle = (operator) => {
+  const handleOperatorToggle = (operators) => {
     setSelectedOperators((prev) =>
-      prev.includes(operator)
-        ? prev.filter((op) => op !== operator)
-        : [...prev, operator]
+      prev.includes(operators[0])
+        ? prev.filter((op) => !operators.includes(op))
+        : [...prev, ...operators]
     );
   };
 
@@ -128,49 +128,64 @@ const MathTimer = ({ setEdittingName, userName, onSessionEnd }) => {
     <div className="container">
       <div className="title-container">
         <h1 className="title">
-          {userName ? `${userName}'s Math Timer` : "Math Timer"}
+          <div
+            style={{
+              display: "flex",
+              alignContent: "center",
+              justifyContent: "center",
+            }}
+          >
+            {userName ? `${userName}'s Math Timer` : "Math Timer"}
+            <a
+              href="#"
+              onClick={() => setPage("name")}
+              style={{
+                textDecoration: "none",
+                color: "#9eb3ff",
+                fontSize: 24,
+                marginLeft: 5,
+                marginTop: 5,
+              }}
+              title="Edit Name"
+            >
+              🖉
+            </a>
+          </div>
         </h1>
-
-        <a href="#" onClick={() => setEdittingName(true)}>
-          Edit Name
-        </a>
       </div>
       <p className="timer">
         Time left: <span>{timer}s</span>
       </p>
       <div className="operator-selection">
         <h3>Select Operators:</h3>
-        <div style={{ display: "flex", justifyContent: "center" }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 20 }}>
           <div style={{ display: "flex", flexDirection: "column" }}>
             {"🪙"}
+            <div>+ and -</div>
             <div>
-              {["+", "-"].map((op) => (
-                <label className="toggle-switch" key={op}>
-                  <input
-                    type="checkbox"
-                    checked={selectedOperators.includes(op)}
-                    onChange={() => handleOperatorToggle(op)}
-                  />
-                  <span className="slider"></span>
-                  <span className="operator-label">{op}</span>
-                </label>
-              ))}
+              <label className="toggle-switch">
+                <input
+                  type="checkbox"
+                  checked={selectedOperators.includes("+")}
+                  onChange={() => handleOperatorToggle(["+", "-"])}
+                />
+                <span className="slider"></span>
+              </label>
             </div>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             {"🎟️"}
+            <div>x and ÷</div>
             <div>
-              {["x", "÷"].map((op) => (
-                <label className="toggle-switch" key={op}>
-                  <input
-                    type="checkbox"
-                    checked={selectedOperators.includes(op)}
-                    onChange={() => handleOperatorToggle(op)}
-                  />
-                  <span className="slider"></span>
-                  <span className="operator-label">{op}</span>
-                </label>
-              ))}
+              <label className="toggle-switch">
+                <input
+                  type="checkbox"
+                  checked={selectedOperators.includes("x")}
+                  onChange={() => handleOperatorToggle(["x", "÷"])}
+                />
+                <span className="slider"></span>
+                <span className="operator-label"></span>
+              </label>
             </div>
           </div>
         </div>
