@@ -82,6 +82,8 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
     setFeedback("");
     setCorrectCount(0);
     setIncorrectCount(0);
+    setSessionCoins(0);
+    setSessionTickets(0);
   }, []);
 
   const handleAnswerChange = (e) => {
