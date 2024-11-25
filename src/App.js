@@ -36,7 +36,7 @@ export default function App() {
 
     if (sessionCoins > highCoins) {
       setHighCoins(sessionCoins);
-      sessionStorage.setItem("highCoins");
+      sessionStorage.setItem("highCoins", sessionCoins);
     }
 
     localStorage.setItem("coins", totalCoins);
@@ -49,7 +49,7 @@ export default function App() {
 
     if (sessionTickets > highTickets) {
       setHighTickets(sessionTickets);
-      sessionStorage.setItem("highTickets");
+      sessionStorage.setItem("highTickets", sessionTickets);
     }
     localStorage.setItem("tickets", totalTickets);
     setTickets((prev) => prev + sessionTickets);
