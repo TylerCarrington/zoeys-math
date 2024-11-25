@@ -76,6 +76,7 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
     "./images/baseball/baseball36.jpeg",
     "./images/baseball/baseball37.jpeg",
     "./images/baseball/baseball38.webp",
+    "./images/baseball/owen1.png",
   ];
 
   // Owned items (fetched from local storage)
