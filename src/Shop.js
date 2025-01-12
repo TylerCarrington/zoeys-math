@@ -79,6 +79,48 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
     "./images/baseball/owen1.png",
   ];
 
+  const pokemonImages = [
+    "./images/pokemon/pokemon01.png",
+    "./images/pokemon/pokemon02.jpg",
+    "./images/pokemon/pokemon03.jpg",
+    "./images/pokemon/pokemon04.jpg",
+    "./images/pokemon/pokemon05.jpg",
+    "./images/pokemon/pokemon06.jpg",
+    "./images/pokemon/pokemon07.jpg",
+    "./images/pokemon/pokemon08.jpg",
+    "./images/pokemon/pokemon09.jpg",
+    "./images/pokemon/pokemon10.jpg",
+    "./images/pokemon/pokemon11.jpg",
+    "./images/pokemon/pokemon12.jpg",
+    "./images/pokemon/pokemon13.jpg",
+    "./images/pokemon/pokemon14.jpg",
+    "./images/pokemon/pokemon15.jpg",
+    "./images/pokemon/pokemon16.jpg",
+    "./images/pokemon/pokemon17.jpg",
+    "./images/pokemon/pokemon18.jpg",
+    "./images/pokemon/pokemon19.jpg",
+    "./images/pokemon/pokemon20.jpg",
+    "./images/pokemon/pokemon21.jpg",
+    "./images/pokemon/pokemon22.jpg",
+    "./images/pokemon/pokemon23.jpg",
+    "./images/pokemon/pokemon24.jpg",
+    "./images/pokemon/pokemon25.jpg",
+    "./images/pokemon/pokemon26.jpg",
+    "./images/pokemon/pokemon27.jpg",
+    "./images/pokemon/pokemon28.jpg",
+    "./images/pokemon/pokemon29.jpg",
+    "./images/pokemon/pokemon30.jpg",
+    "./images/pokemon/pokemon31.jpg",
+    "./images/pokemon/pokemon32.jpg",
+    "./images/pokemon/pokemon33.jpg",
+    "./images/pokemon/pokemon34.jpg",
+    "./images/pokemon/pokemon35.jpg",
+    "./images/pokemon/pokemon36.jpg",
+    "./images/pokemon/pokemon37.jpg",
+    "./images/pokemon/pokemon38.jpg",
+    "./images/pokemon/pokemon39.jpg",
+  ];
+
   // Owned items (fetched from local storage)
   const [ownedItems, setOwnedItems] = useState(
     JSON.parse(localStorage.getItem("ownedItems")) || []
@@ -125,6 +167,39 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
         tiggerModal(randomBaseball);
       } else {
         alert("Not enough coins to purchase the Baseball Pack.");
+      }
+    } else if (
+      type === "Pokemon Stellar Coin" ||
+      type === "Pokemon Stellar Ticket"
+    ) {
+      availableImages = pokemonImages.filter(
+        (img) => !ownedItems.includes(img)
+      );
+      if (availableImages.length === 0) {
+        alert("You already own all the Pokemon Stellar Crown images!");
+        return;
+      }
+
+      if (type === "Pokemon Stellar Coin") {
+        if (coins >= 50) {
+          const randomPokemon =
+            availableImages[Math.floor(Math.random() * availableImages.length)];
+          setCoins(-50);
+          setOwnedItems((prev) => [...prev, randomPokemon]);
+          tiggerModal(randomPokemon);
+        } else {
+          alert("Not enough coins to purchase the Pokemon Pack.");
+        }
+      } else {
+        if (tickets >= 50) {
+          const randomPokemon =
+            availableImages[Math.floor(Math.random() * availableImages.length)];
+          setTickets(-50);
+          setOwnedItems((prev) => [...prev, randomPokemon]);
+          tiggerModal(randomPokemon);
+        } else {
+          alert("Not enough tickets to purchase the Pokemon Pack.");
+        }
       }
     }
   };
@@ -199,6 +274,46 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
           >
             Buy Baseball Pack
           </button>
+        </div>
+        <div>
+          <h2>Baseball Pack</h2>
+          <img
+            src={"./images/packs/stellar-crown.jpg"}
+            alt="Stellar Crown Item"
+            style={{ width: "100px", height: "100px", objectFit: "contain" }}
+          />
+          <div>
+            <div>
+              <p>Cost: 50 🪙</p>
+              <button
+                onClick={() => handlePurchase("Pokemon Stellar Coin")}
+                class="submit-button"
+                style={
+                  coins < 50
+                    ? { backgroundColor: "lightgray", cursor: "readonly" }
+                    : {}
+                }
+                disabled={coins < 50}
+              >
+                Buy Pokemon Pack
+              </button>
+            </div>
+            <div>
+              <p>Cost: 50 🎟️</p>
+              <button
+                onClick={() => handlePurchase("Pokemon Stellar Ticket")}
+                class="submit-button"
+                style={
+                  tickets < 50
+                    ? { backgroundColor: "lightgray", cursor: "readonly" }
+                    : {}
+                }
+                disabled={tickets < 50}
+              >
+                Buy Pokemon Pack
+              </button>
+            </div>
+          </div>
         </div>
       </div>
       <div style={{ marginTop: 20 }}>
