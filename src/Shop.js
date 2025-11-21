@@ -1,8 +1,36 @@
 import React, { useState, useEffect } from "react";
 
-const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
+// 1. Define Threshold Constants
+const ANIMAL_THRESHOLD = 25;
+const BASEBALL_THRESHOLD = 30;
+const POKEMON_THRESHOLD = 20;
+
+// UPDATED PROPS: Included props for Gem functionality and history
+const Shop = ({
+  coins,
+  tickets,
+  setCoins,
+  setTickets,
+  gems,
+  persistGems,
+  setPage,
+  gemHistory,
+  showGemHistory,
+  toggleGemHistoryModal,
+}) => {
   const [showModal, setShowModal] = useState(false);
   const [receivedImage, setReceivedImage] = useState("");
+
+  // Helper function to format the timestamp for display
+  const formatTimestamp = (timestamp) => {
+    return new Date(timestamp).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   // Animal Pack and Baseball Pack Images
   const animalImages = [
@@ -144,13 +172,59 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
     localStorage.setItem("ownedItems", JSON.stringify(ownedItems));
   }, [ownedItems]);
 
+  // NEW: Helper function to get the current count of owned items for a pack
+  const getOwnedPackCount = (packImages) => {
+    return packImages.filter((item) => ownedItems.includes(item)).length;
+  };
+
+  // Helper function to check if the collection meets the exchange threshold
+  const meetsExchangeThreshold = (packImages, packThreshold) => {
+    const ownedPackItemsCount = getOwnedPackCount(packImages);
+    const effectiveThreshold = Math.min(packThreshold, packImages.length);
+    return ownedPackItemsCount >= effectiveThreshold;
+  };
+
+  // Function to handle collection trade-in
+  const handleTradeInCollection = (packType, packImages, packThreshold) => {
+    const gemReward = 1;
+
+    if (!meetsExchangeThreshold(packImages, packThreshold)) {
+      alert(
+        `The ${packType} collection must have at least ${packThreshold} items to exchange for a Gem.`
+      );
+      return;
+    }
+
+    const itemsToExchangeCount = getOwnedPackCount(packImages);
+
+    const confirmation = window.confirm(
+      `Are you sure you want to trade in ALL ${itemsToExchangeCount} items from your ${packType} collection for ${gemReward} 💎 Gem? This will remove all of these items from your gallery.`
+    );
+
+    if (confirmation) {
+      persistGems(gemReward, packType);
+
+      // Filter out all items that belong to the traded-in pack (removes ALL)
+      const newOwnedItems = ownedItems.filter(
+        (item) => !packImages.includes(item)
+      );
+      setOwnedItems(newOwnedItems);
+
+      alert(
+        `Collection successfully traded in! You exchanged ${itemsToExchangeCount} items and received ${gemReward} 💎 Gem. Your ${packType} collection has been reset.`
+      );
+    }
+  };
+
   const handlePurchase = (type) => {
     let availableImages = [];
 
     if (type === "Animal Pack") {
       availableImages = animalImages.filter((img) => !ownedItems.includes(img));
       if (availableImages.length === 0) {
-        alert("You already own all the Animal Pack images!");
+        alert(
+          "You already own all the Animal Pack images! Consider exchanging 25+ items for a Gem."
+        );
         return;
       }
 
@@ -169,7 +243,9 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
         (img) => !ownedItems.includes(img)
       );
       if (availableImages.length === 0) {
-        alert("You already own all the Baseball Pack images!");
+        alert(
+          "You already own all the Baseball Pack images! Consider exchanging 30+ items for a Gem."
+        );
         return;
       }
 
@@ -190,7 +266,9 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
         (img) => !ownedItems.includes(img)
       );
       if (availableImages.length === 0) {
-        alert("You already own all the Pokemon Stellar Crown images!");
+        alert(
+          "You already own all the Pokemon Stellar Crown images! Consider exchanging 20+ items for a Gem."
+        );
         return;
       }
 
@@ -228,6 +306,7 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
     setShowModal(true);
   };
 
+  // Component rendering starts here
   return (
     <div className="container">
       <div
@@ -244,9 +323,16 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
         </a>
         <span>🪙:{coins}</span>
         <span>🎟️: {tickets}</span>
+        <span
+          onClick={toggleGemHistoryModal}
+          style={{ cursor: "pointer", fontWeight: "bold" }}
+        >
+          💎: {gems}
+        </span>
       </div>
       <h1>Shop</h1>
       <div style={{ display: "flex", justifyContent: "center", gap: 20 }}>
+        {/* Animal Pack */}
         <div>
           <h2>Animal Pack</h2>
           <img
@@ -257,7 +343,7 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
           <p>Cost: 25 🎟️ and 25🪙</p>
           <button
             onClick={() => handlePurchase("Animal Pack")}
-            class="submit-button"
+            className="submit-button"
             style={
               coins < 25 || tickets < 25
                 ? { backgroundColor: "lightgray", cursor: "readonly" }
@@ -267,7 +353,39 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
           >
             Buy Animal Pack
           </button>
+
+          {/* UPDATED Trade-In Button with Progress */}
+          {(() => {
+            const currentCount = getOwnedPackCount(animalImages);
+            const threshold = ANIMAL_THRESHOLD;
+            const isReady = meetsExchangeThreshold(animalImages, threshold);
+            const buttonText = isReady
+              ? `Exchange ${currentCount} items for 💎 Gem`
+              : `Progress: ${currentCount}/${threshold}`;
+
+            return (
+              <button
+                onClick={() =>
+                  handleTradeInCollection(
+                    "Animal Pack",
+                    animalImages,
+                    threshold
+                  )
+                }
+                className="submit-button"
+                style={{
+                  backgroundColor: isReady ? "#20b2aa" : "#808080", // Highlight green when ready, otherwise gray
+                  marginTop: "10px",
+                }}
+                disabled={!isReady}
+              >
+                {buttonText}
+              </button>
+            );
+          })()}
         </div>
+
+        {/* Baseball Pack */}
         <div>
           <h2>Baseball Pack</h2>
           <img
@@ -278,7 +396,7 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
           <p>Cost: 25 🪙</p>
           <button
             onClick={() => handlePurchase("Baseball Pack")}
-            class="submit-button"
+            className="submit-button"
             style={
               coins < 25
                 ? { backgroundColor: "lightgray", cursor: "readonly" }
@@ -288,9 +406,41 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
           >
             Buy Baseball Pack
           </button>
+
+          {/* UPDATED Trade-In Button with Progress */}
+          {(() => {
+            const currentCount = getOwnedPackCount(baseballImages);
+            const threshold = BASEBALL_THRESHOLD;
+            const isReady = meetsExchangeThreshold(baseballImages, threshold);
+            const buttonText = isReady
+              ? `Exchange ${currentCount} items for 💎 Gem`
+              : `Progress: ${currentCount}/${threshold}`;
+
+            return (
+              <button
+                onClick={() =>
+                  handleTradeInCollection(
+                    "Baseball Pack",
+                    baseballImages,
+                    threshold
+                  )
+                }
+                className="submit-button"
+                style={{
+                  backgroundColor: isReady ? "#20b2aa" : "#808080",
+                  marginTop: "10px",
+                }}
+                disabled={!isReady}
+              >
+                {buttonText}
+              </button>
+            );
+          })()}
         </div>
+
+        {/* Pokemon Pack */}
         <div>
-          <h2>Pokemon Pack</h2>
+          <h2>Pokemon Stellar Crown</h2>
           <img
             src={"./images/packs/stellar-crown.jpg"}
             alt="Stellar Crown Item"
@@ -301,7 +451,7 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
               <p>Cost: 50 🪙</p>
               <button
                 onClick={() => handlePurchase("Pokemon Stellar Coin")}
-                class="submit-button"
+                className="submit-button"
                 style={
                   coins < 50
                     ? { backgroundColor: "lightgray", cursor: "readonly" }
@@ -309,14 +459,14 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
                 }
                 disabled={coins < 50}
               >
-                Buy Pokemon Pack
+                Buy Pokemon Pack (Coin)
               </button>
             </div>
             <div>
               <p>Cost: 50 🎟️</p>
               <button
                 onClick={() => handlePurchase("Pokemon Stellar Ticket")}
-                class="submit-button"
+                className="submit-button"
                 style={
                   tickets < 50
                     ? { backgroundColor: "lightgray", cursor: "readonly" }
@@ -324,10 +474,40 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
                 }
                 disabled={tickets < 50}
               >
-                Buy Pokemon Pack
+                Buy Pokemon Pack (Ticket)
               </button>
             </div>
           </div>
+
+          {/* UPDATED Trade-In Button with Progress */}
+          {(() => {
+            const currentCount = getOwnedPackCount(pokemonImages);
+            const threshold = POKEMON_THRESHOLD;
+            const isReady = meetsExchangeThreshold(pokemonImages, threshold);
+            const buttonText = isReady
+              ? `Exchange ${currentCount} items for 💎 Gem`
+              : `Progress: ${currentCount}/${threshold}`;
+
+            return (
+              <button
+                onClick={() =>
+                  handleTradeInCollection(
+                    "Pokemon Pack",
+                    pokemonImages,
+                    threshold
+                  )
+                }
+                className="submit-button"
+                style={{
+                  backgroundColor: isReady ? "#20b2aa" : "#808080",
+                  marginTop: "10px",
+                }}
+                disabled={!isReady}
+              >
+                {buttonText}
+              </button>
+            );
+          })()}
         </div>
       </div>
       <div style={{ marginTop: 20 }}>
@@ -353,6 +533,8 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
           )}
         </div>
       </div>
+
+      {/* Existing Item Received Modal (omitted for brevity) */}
       {showModal && receivedImage && (
         <div
           style={{
@@ -365,6 +547,7 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            zIndex: 1000,
           }}
         >
           <div
@@ -388,6 +571,90 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
             />
             <button
               onClick={closeModal}
+              style={{
+                marginTop: "20px",
+                padding: "10px 20px",
+                backgroundColor: "#4CAF50",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Gem History Modal (omitted for brevity) */}
+      {showGemHistory && (
+        <div
+          style={{
+            position: "fixed",
+            top: "0",
+            left: "0",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+              borderRadius: "8px",
+              textAlign: "center",
+              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)",
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+              alignContent: "center",
+              width: "80%",
+              maxWidth: "500px",
+            }}
+          >
+            <h2>Gem Exchange History ({gems} 💎)</h2>
+            {gemHistory.length === 0 ? (
+              <p>No Gems have been exchanged yet.</p>
+            ) : (
+              <ul
+                style={{
+                  listStyleType: "none",
+                  padding: 0,
+                  textAlign: "left",
+                  maxHeight: "300px",
+                  overflowY: "auto",
+                }}
+              >
+                {gemHistory
+                  .slice()
+                  .reverse()
+                  .map((record, index) => (
+                    <li
+                      key={index}
+                      style={{
+                        marginBottom: "10px",
+                        padding: "5px",
+                        borderBottom: "1px solid #eee",
+                      }}
+                    >
+                      <span style={{ fontWeight: "bold" }}>+1 💎</span> from{" "}
+                      {record.collection} on
+                      <br />
+                      <span style={{ fontSize: "0.9em" }}>
+                        {formatTimestamp(record.date)}
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            )}
+            <button
+              onClick={toggleGemHistoryModal}
               style={{
                 marginTop: "20px",
                 padding: "10px 20px",

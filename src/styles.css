@@ -241,3 +241,27 @@ body {
 .submit-button:hover {
   background-color: #45a049;
 }
+
+/* --- High Score Overlap Fix --- */
+
+/* Style the high score container when in a tight space */
+.high-score-container {
+  /* Set a minimum width to prevent collapse */
+  min-width: 250px;
+  /* Add padding to prevent content from touching the screen edge */
+  padding: 5px;
+}
+
+/* Adjust the font size for the score lines on smaller screens */
+@media (max-width: 450px) {
+  .high-score-container {
+    font-size: 0.85em; /* Shrink text slightly */
+    /* If the app container uses position:relative, you could remove absolute positioning here
+       but for now, we only adjust font size and container size. */
+  }
+}
+
+/* Ensure the container is recognized by App.js */
+.high-score-container div {
+  white-space: nowrap; /* Prevent lines from breaking unnecessarily */
+}

@@ -18,8 +18,16 @@ export default function App() {
   const [tickets, setTickets] = useState(
     parseInt(localStorage.getItem("tickets")) || 0
   );
+  // State for Gems
+  const [gems, setGems] = useState(parseInt(localStorage.getItem("gems")) || 0);
+  // State for Gem History
+  const [gemHistory, setGemHistory] = useState(
+    JSON.parse(localStorage.getItem("gemHistory")) || []
+  );
+  // State to control the visibility of the Gem history modal
+  const [showGemHistory, setShowGemHistory] = useState(false);
 
-  // --- New States for Persistent High Scores ---
+  // --- RE-ADDED: States for Persistent High Scores (Day, Week, All-Time) ---
 
   // All Time
   const [highCoinsAllTime, setHighCoinsAllTime] = useState(
@@ -51,7 +59,7 @@ export default function App() {
     parseInt(localStorage.getItem("lastWeekReset")) || Date.now()
   );
 
-  // --- END New States ---
+  // --- END RE-ADDED States ---
 
   const handleNameSubmit = (name) => {
     setUserName(name);
@@ -64,18 +72,18 @@ export default function App() {
 
     const now = Date.now();
 
-    // --- All-Time High Score Check ---
+    // All-Time High Score Check
     if (sessionCoins > highCoinsAllTime) {
       setHighCoinsAllTime(sessionCoins);
       localStorage.setItem("highCoinsAllTime", sessionCoins);
     }
 
-    // --- Daily High Score Check (resets at midnight) ---
+    // Daily High Score Check (resets at midnight)
     const lastDay = new Date(lastDayReset);
     const today = new Date();
     let currentDayHigh = highCoinsDay;
 
-    // Check if it's a new day
+    // Check if it's a new day (year, month, or date change)
     if (
       today.getFullYear() > lastDay.getFullYear() ||
       today.getMonth() > lastDay.getMonth() ||
@@ -93,11 +101,11 @@ export default function App() {
       localStorage.setItem("highCoinsDay", sessionCoins);
     }
 
-    // --- Weekly High Score Check (resets after 7 full days) ---
+    // Weekly High Score Check (resets after 7 full days)
     const oneWeek = 7 * 24 * 60 * 60 * 1000;
     let currentWeekHigh = highCoinsWeek;
 
-    // Check if a week has passed since the last reset
+    // Check if a week (7 days) has passed since the last reset
     if (now - lastWeekReset > oneWeek) {
       // New week, reset the high score
       currentWeekHigh = 0;
@@ -122,13 +130,13 @@ export default function App() {
 
     const now = Date.now();
 
-    // --- All-Time High Score Check ---
+    // All-Time High Score Check
     if (sessionTickets > highTicketsAllTime) {
       setHighTicketsAllTime(sessionTickets);
       localStorage.setItem("highTicketsAllTime", sessionTickets);
     }
 
-    // --- Daily High Score Check (resets at midnight) ---
+    // Daily High Score Check (resets at midnight)
     const lastDay = new Date(lastDayReset);
     const today = new Date();
     let currentDayHigh = highTicketsDay;
@@ -141,7 +149,6 @@ export default function App() {
     ) {
       // New day, reset the high score
       currentDayHigh = 0;
-      // lastDayReset is already updated by persistCoins if it ran first
     }
 
     // Check if sessionTickets beats the current (or reset) day high
@@ -150,18 +157,14 @@ export default function App() {
       localStorage.setItem("highTicketsDay", sessionTickets);
     }
 
-    // --- Weekly High Score Check (resets after 7 full days) ---
+    // Weekly High Score Check (resets after 7 full days)
     const oneWeek = 7 * 24 * 60 * 60 * 1000;
     let currentWeekHigh = highTicketsWeek;
 
-    // Check if a week has passed since the last reset
     if (now - lastWeekReset > oneWeek) {
-      // New week, reset the high score
       currentWeekHigh = 0;
-      // lastWeekReset is already updated by persistCoins if it ran first
     }
 
-    // Check if sessionTickets beats the current (or reset) week high
     if (sessionTickets > currentWeekHigh) {
       setHighTicketsWeek(sessionTickets);
       localStorage.setItem("highTicketsWeek", sessionTickets);
@@ -171,6 +174,33 @@ export default function App() {
     localStorage.setItem("tickets", totalTickets);
     setTickets((prev) => prev + sessionTickets);
   };
+
+  // UPDATED: persistGems now logs history
+  const persistGems = (sessionGems, collectionType) => {
+    // 1. Update total Gems count
+    const totalGems =
+      parseInt(localStorage.getItem("gems") || "0") + sessionGems;
+    localStorage.setItem("gems", totalGems);
+    setGems((prev) => prev + sessionGems);
+
+    // 2. Log history only if a new gem was earned
+    if (sessionGems > 0) {
+      const newRecord = {
+        date: Date.now(),
+        collection: collectionType,
+      };
+
+      // Get existing history from local storage and append the new record
+      const currentHistory =
+        JSON.parse(localStorage.getItem("gemHistory")) || [];
+      const newHistory = [...currentHistory, newRecord];
+
+      localStorage.setItem("gemHistory", JSON.stringify(newHistory));
+      setGemHistory(newHistory);
+    }
+  };
+
+  const toggleGemHistoryModal = () => setShowGemHistory((prev) => !prev);
 
   const handleSessionEnd = (sessionCoins, sessionTickets) => {
     persistCoins(sessionCoins);
@@ -184,9 +214,15 @@ export default function App() {
       <Shop
         coins={coins}
         tickets={tickets}
+        gems={gems}
+        persistGems={persistGems}
         setCoins={persistCoins}
         setTickets={persistTickets}
         setPage={setPage}
+        // NEW PROPS FOR GEM HISTORY
+        gemHistory={gemHistory}
+        showGemHistory={showGemHistory}
+        toggleGemHistoryModal={toggleGemHistoryModal}
       />
     );
   } else {
@@ -206,8 +242,11 @@ export default function App() {
           </a>
           <span>🪙 {coins}</span>
           <span>🎟️ {tickets}</span>
+          <span>💎 {gems}</span>
         </div>
+        {/* ADDED CLASS FOR CSS FIX */}
         <div
+          className="high-score-container"
           style={{
             position: "absolute",
             top: 10,
@@ -218,7 +257,6 @@ export default function App() {
             textAlign: "left",
           }}
         >
-          {/* Updated High Score Display */}
           <div>
             <span>High Score (All Time): </span>
             <span>🪙 {highCoinsAllTime}</span>
