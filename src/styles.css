@@ -242,26 +242,48 @@ body {
   background-color: #45a049;
 }
 
-/* --- High Score Overlap Fix --- */
+/* --- High Score Modal Styles --- */
 
-/* Style the high score container when in a tight space */
-.high-score-container {
-  /* Set a minimum width to prevent collapse */
-  min-width: 250px;
-  /* Add padding to prevent content from touching the screen edge */
-  padding: 5px;
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Dark semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-/* Adjust the font size for the score lines on smaller screens */
-@media (max-width: 450px) {
-  .high-score-container {
-    font-size: 0.85em; /* Shrink text slightly */
-    /* If the app container uses position:relative, you could remove absolute positioning here
-       but for now, we only adjust font size and container size. */
-  }
+.modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  max-width: 90%;
+  width: 500px;
+  text-align: center;
 }
 
-/* Ensure the container is recognized by App.js */
-.high-score-container div {
-  white-space: nowrap; /* Prevent lines from breaking unnecessarily */
+.high-score-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+}
+
+.high-score-table th,
+.high-score-table td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+.high-score-table th {
+  background-color: #f0f0f0;
+}
+
+.modal-content .submit-button {
+  margin-top: 20px;
 }
