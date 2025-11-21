@@ -75,6 +75,7 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
   const startTimer = useCallback(() => {
     setIsTimerRunning(true);
     setTimer(60);
+    // The component will correctly use the latest selectedOperators when this function is called
     const { problem, answer } = generateMathProblem(selectedOperators);
     setProblem(problem);
     setAnswer(answer);
@@ -84,11 +85,10 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
     setIncorrectCount(0);
     setSessionCoins(0);
     setSessionTickets(0);
-  }, []);
+  }, [selectedOperators]);
 
   const handleAnswerChange = (e) => {
     setUserAnswer(e.target.value);
-    generateMathProblem(selectedOperators);
   };
 
   const handleSubmitAnswer = () => {
@@ -162,34 +162,60 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
       <div className="operator-selection">
         <h3>Select Operators:</h3>
         <div style={{ display: "flex", justifyContent: "center", gap: 20 }}>
-          <div style={{ display: "flex", flexDirection: "column" }}>
+          {/* Addition Toggle */}
+          <div className="operator-group">
             {"🪙"}
-            <div>+ and -</div>
-            <div>
-              <label className="toggle-switch">
-                <input
-                  type="checkbox"
-                  checked={selectedOperators.includes("+")}
-                  onChange={() => handleOperatorToggle(["+", "-"])}
-                />
-                <span className="slider"></span>
-              </label>
-            </div>
+            <div>+</div>
+            <label className="toggle-switch">
+              <input
+                type="checkbox"
+                checked={selectedOperators.includes("+")}
+                onChange={() => handleOperatorToggle("+")}
+              />
+              <span className="slider"></span>
+            </label>
           </div>
-          <div style={{ display: "flex", flexDirection: "column" }}>
+
+          {/* Subtraction Toggle */}
+          <div className="operator-group">
+            {"🪙"}
+            <div>-</div>
+            <label className="toggle-switch">
+              <input
+                type="checkbox"
+                checked={selectedOperators.includes("-")}
+                onChange={() => handleOperatorToggle("-")}
+              />
+              <span className="slider"></span>
+            </label>
+          </div>
+
+          {/* Multiplication Toggle */}
+          <div className="operator-group">
             {"🎟️"}
-            <div>x and ÷</div>
-            <div>
-              <label className="toggle-switch">
-                <input
-                  type="checkbox"
-                  checked={selectedOperators.includes("x")}
-                  onChange={() => handleOperatorToggle(["x", "÷"])}
-                />
-                <span className="slider"></span>
-                <span className="operator-label"></span>
-              </label>
-            </div>
+            <div>x</div>
+            <label className="toggle-switch">
+              <input
+                type="checkbox"
+                checked={selectedOperators.includes("x")}
+                onChange={() => handleOperatorToggle("x")}
+              />
+              <span className="slider"></span>
+            </label>
+          </div>
+
+          {/* Division Toggle */}
+          <div className="operator-group">
+            {"🎟️"}
+            <div>÷</div>
+            <label className="toggle-switch">
+              <input
+                type="checkbox"
+                checked={selectedOperators.includes("÷")}
+                onChange={() => handleOperatorToggle("÷")}
+              />
+              <span className="slider"></span>
+            </label>
           </div>
         </div>
       </div>
