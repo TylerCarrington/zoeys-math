@@ -1,7 +1,7 @@
 import { useState } from "react";
-import NameEntry from "./NameEntry";
-import GamePage from "./pages/GamePage";
-import ShopPage from "./pages/ShopPage";
+import NameEntry from "./components/NameEntry";
+import GamePage from "./features/game/GamePage";
+import ShopPage from "./features/shop/ShopPage";
 import { useGameState } from "./hooks/useGameState";
 
 export default function App() {

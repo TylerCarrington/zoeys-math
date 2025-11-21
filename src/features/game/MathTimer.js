@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import AnswerInput from "../../components/AnswerInput";
+import ScoreDisplay from "../../components/ScoreDisplay";
 
 // Function to generate a random math problem
 const generateMathProblem = (selectedOperators) => {
@@ -234,33 +236,22 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
           <p className="problem">
             Problem: <span>{problem}</span>
           </p>
-          <div className="input-container">
-            <input
-              className="answer-input"
-              type="number"
-              value={userAnswer}
-              onChange={handleAnswerChange}
-              onKeyDown={handleKeyDown}
-              disabled={timer === 0}
-            />
-            <button
-              className="submit-button"
-              onClick={handleSubmitAnswer}
-              disabled={timer === 0}
-            >
-              Submit
-            </button>
-          </div>
+          <AnswerInput
+            userAnswer={userAnswer}
+            handleAnswerChange={handleAnswerChange}
+            handleKeyDown={handleKeyDown}
+            handleSubmitAnswer={handleSubmitAnswer}
+            disabled={timer === 0}
+          />
           {feedback && <p className="feedback">{feedback}</p>}
         </div>
       )}
       {!isTimerRunning && timer === 0 && (
-        <div className="score-container">
-          <h2>Final Score</h2>
-          {feedback && <p className="feedback">{feedback}</p>}
-          <p className="score correct">Correct: {correctCount}</p>
-          <p className="score incorrect">Incorrect: {incorrectCount}</p>
-        </div>
+        <ScoreDisplay
+          feedback={feedback}
+          correctCount={correctCount}
+          incorrectCount={incorrectCount}
+        />
       )}
     </div>
   );

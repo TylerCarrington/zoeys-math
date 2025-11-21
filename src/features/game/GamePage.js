@@ -1,7 +1,7 @@
 import React from "react";
-import Header from "../Header";
-import MathTimer from "../MathTimer";
-import GemHistoryModal from "../GemHistoryModal";
+import Header from "../../components/Header";
+import MathTimer from "./MathTimer";
+import GemHistoryModal from "../../components/GemHistoryModal";
 
 export default function GamePage({
   page,

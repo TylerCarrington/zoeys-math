@@ -1,7 +1,7 @@
 import React from "react";
-import Header from "../Header";
-import Shop from "../Shop";
-import GemHistoryModal from "../GemHistoryModal";
+import Header from "../../components/Header";
+import Shop from "./Shop";
+import GemHistoryModal from "../../components/GemHistoryModal";
 
 export default function ShopPage({
   page,
