@@ -1,11 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+// 1. IMPORT THE GENERATED IMAGE LISTS
+import { animalsImages } from "./image-lists/animals";
+import { baseballImages } from "./image-lists/baseball";
+import { pokemonImages } from "./image-lists/pokemon";
+// 2. IMPORT THE NEW STANDALONE MODAL
+import GemHistoryModal from "./GemHistoryModal";
+import HighScore from "./HighScore";
 
-// 1. Define Threshold Constants
+// Define Threshold Constants
 const ANIMAL_THRESHOLD = 25;
-const BASEBALL_THRESHOLD = 40;
+const BASEBALL_THRESHOLD = 30;
 const POKEMON_THRESHOLD = 20;
 
-// UPDATED PROPS: Included props for Gem functionality and history
+// Since HighScore.js manages its own modal, Shop doesn't need to trigger it.
+// We will remove toggleHighScoreModal from props.
 const Shop = ({
   coins,
   tickets,
@@ -17,151 +25,22 @@ const Shop = ({
   gemHistory,
   showGemHistory,
   toggleGemHistoryModal,
+  sessionEndTrigger, // Keeping this if needed later
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [receivedImage, setReceivedImage] = useState("");
 
-  // Helper function to format the timestamp for display
-  const formatTimestamp = (timestamp) => {
-    return new Date(timestamp).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
-  // Animal Pack and Baseball Pack Images
-  const animalImages = [
-    "./images/animals/animal1.webp",
-    "./images/animals/animal2.webp",
-    "./images/animals/animal3.webp",
-    "./images/animals/animal4.webp",
-    "./images/animals/animal5.webp",
-    "./images/animals/animal6.webp",
-    "./images/animals/animal7.webp",
-    "./images/animals/animal8.webp",
-    "./images/animals/animal9.webp",
-    "./images/animals/animal10.png",
-    "./images/animals/animal10.webp",
-    "./images/animals/animal11.webp",
-    "./images/animals/animal12.webp",
-    "./images/animals/animal13.webp",
-    "./images/animals/animal14.webp",
-    "./images/animals/animal15.webp",
-    "./images/animals/animal16.webp",
-    "./images/animals/animal17.webp",
-    "./images/animals/animal18.webp",
-    "./images/animals/animal19.webp",
-    "./images/animals/animal20.webp",
-    "./images/animals/animal21.webp",
-    "./images/animals/animal22.webp",
-    "./images/animals/animal23.webp",
-    "./images/animals/animal24.webp",
-    "./images/animals/animal25.webp",
-    "./images/animals/husky1.png",
-    "./images/animals/husky2.png",
-    "./images/animals/husky3.png",
-    "./images/animals/zoey.png",
-  ];
-  const baseballImages = [
-    "./images/baseball/baseball1.jpeg",
-    "./images/baseball/baseball2.jpeg",
-    "./images/baseball/baseball3.jpeg",
-    "./images/baseball/baseball4.jpeg",
-    "./images/baseball/baseball5.jpeg",
-    "./images/baseball/baseball6.jpeg",
-    "./images/baseball/baseball7.jpeg",
-    "./images/baseball/baseball8.jpeg",
-    "./images/baseball/baseball9.jpeg",
-    "./images/baseball/baseball10.jpeg",
-    "./images/baseball/baseball11.jpeg",
-    "./images/baseball/baseball12.jpeg",
-    "./images/baseball/baseball13.jpeg",
-    "./images/baseball/baseball14.jpeg",
-    "./images/baseball/baseball15.jpeg",
-    "./images/baseball/baseball16.jpeg",
-    "./images/baseball/baseball17.jpeg",
-    "./images/baseball/baseball18.jpeg",
-    "./images/baseball/baseball19.jpeg",
-    "./images/baseball/baseball20.jpeg",
-    "./images/baseball/baseball21.jpeg",
-    "./images/baseball/baseball22.jpeg",
-    "./images/baseball/baseball23.jpeg",
-    "./images/baseball/baseball24.jpeg",
-    "./images/baseball/baseball25.jpeg",
-    "./images/baseball/baseball26.webp",
-    "./images/baseball/baseball27.jpeg",
-    "./images/baseball/baseball28.jpeg",
-    "./images/baseball/baseball29.jpeg",
-    "./images/baseball/baseball30.jpeg",
-    "./images/baseball/baseball31.jpeg",
-    "./images/baseball/baseball32.jpeg",
-    "./images/baseball/baseball33.jpeg",
-    "./images/baseball/baseball34.jpeg",
-    "./images/baseball/baseball35.jpeg",
-    "./images/baseball/baseball36.jpeg",
-    "./images/baseball/baseball37.jpeg",
-    "./images/baseball/baseball38.webp",
-    "./images/baseball/baseball39.jpeg",
-    "./images/baseball/baseball40.jpeg",
-    "./images/baseball/baseball41.jpeg",
-    "./images/baseball/baseball42.jpeg",
-    "./images/baseball/baseball43.jpeg",
-    "./images/baseball/baseball44.jpeg",
-    "./images/baseball/baseball45.jpeg",
-    "./images/baseball/baseball46.jpeg",
-    "./images/baseball/baseball47.jpeg",
-    "./images/baseball/baseball48.jpeg",
-    "./images/baseball/baseball49.jpeg",
-    "./images/baseball/baseball50.jpeg",
-    "./images/baseball/baseball51.jpeg",
-    "./images/baseball/baseball52.jpeg",
-    "./images/baseball/owen1.png",
-  ];
-
-  const pokemonImages = [
-    "./images/pokemon/pokemon01.png",
-    "./images/pokemon/pokemon02.jpg",
-    "./images/pokemon/pokemon03.jpg",
-    "./images/pokemon/pokemon04.jpg",
-    "./images/pokemon/pokemon05.jpg",
-    "./images/pokemon/pokemon06.jpg",
-    "./images/pokemon/pokemon07.jpg",
-    "./images/pokemon/pokemon08.jpg",
-    "./images/pokemon/pokemon09.jpg",
-    "./images/pokemon/pokemon10.jpg",
-    "./images/pokemon/pokemon11.jpg",
-    "./images/pokemon/pokemon12.jpg",
-    "./images/pokemon/pokemon13.jpg",
-    "./images/pokemon/pokemon14.jpg",
-    "./images/pokemon/pokemon15.jpg",
-    "./images/pokemon/pokemon16.jpg",
-    "./images/pokemon/pokemon17.jpg",
-    "./images/pokemon/pokemon18.jpg",
-    "./images/pokemon/pokemon19.jpg",
-    "./images/pokemon/pokemon20.jpg",
-    "./images/pokemon/pokemon21.jpg",
-    "./images/pokemon/pokemon22.jpg",
-    "./images/pokemon/pokemon23.jpg",
-    "./images/pokemon/pokemon24.jpg",
-    "./images/pokemon/pokemon25.jpg",
-    "./images/pokemon/pokemon26.jpg",
-    "./images/pokemon/pokemon27.jpg",
-    "./images/pokemon/pokemon28.jpg",
-    "./images/pokemon/pokemon29.jpg",
-    "./images/pokemon/pokemon30.jpg",
-    "./images/pokemon/pokemon31.jpg",
-    "./images/pokemon/pokemon32.jpg",
-    "./images/pokemon/pokemon33.jpg",
-    "./images/pokemon/pokemon34.jpg",
-    "./images/pokemon/pokemon35.jpg",
-    "./images/pokemon/pokemon36.jpg",
-    "./images/pokemon/pokemon37.jpg",
-    "./images/pokemon/pokemon38.jpg",
-    "./images/pokemon/pokemon39.jpg",
-  ];
+  // --- Session Storage Read-Only High Scores for Shop Display ---
+  // Using a memoized calculation to read session storage for display purposes.
+  // These scores reflect the highest single session this time the app was opened.
+  const sessionHighCoins = useMemo(
+    () => parseInt(sessionStorage.getItem("highCoins")) || 0,
+    [sessionEndTrigger]
+  );
+  const sessionHighTickets = useMemo(
+    () => parseInt(sessionStorage.getItem("highTickets")) || 0,
+    [sessionEndTrigger]
+  );
 
   // Owned items (fetched from local storage)
   const [ownedItems, setOwnedItems] = useState(
@@ -172,13 +51,17 @@ const Shop = ({
     localStorage.setItem("ownedItems", JSON.stringify(ownedItems));
   }, [ownedItems]);
 
-  // NEW: Helper function to get the current count of owned items for a pack
+  // Helper function to get the current count of owned items for a pack
   const getOwnedPackCount = (packImages) => {
+    // Ensure the array exists before filtering
+    if (!packImages || packImages.length === 0) return 0;
     return packImages.filter((item) => ownedItems.includes(item)).length;
   };
 
   // Helper function to check if the collection meets the exchange threshold
   const meetsExchangeThreshold = (packImages, packThreshold) => {
+    // Ensure the array exists before calculating count
+    if (!packImages || packImages.length === 0) return false;
     const ownedPackItemsCount = getOwnedPackCount(packImages);
     const effectiveThreshold = Math.min(packThreshold, packImages.length);
     return ownedPackItemsCount >= effectiveThreshold;
@@ -218,81 +101,56 @@ const Shop = ({
 
   const handlePurchase = (type) => {
     let availableImages = [];
+    let imageList = [];
+    let coinsCost = 0;
+    let ticketsCost = 0;
+    let alertMessage = "";
 
     if (type === "Animal Pack") {
-      availableImages = animalImages.filter((img) => !ownedItems.includes(img));
-      if (availableImages.length === 0) {
-        alert(
-          "You already own all the Animal Pack images! Consider exchanging 25+ items for a Gem."
-        );
-        return;
-      }
-
-      if (coins >= 25 && tickets >= 25) {
-        const randomAnimal =
-          availableImages[Math.floor(Math.random() * availableImages.length)];
-        setCoins(-25);
-        setTickets(-25);
-        setOwnedItems((prev) => [...prev, randomAnimal]);
-        tiggerModal(randomAnimal);
-      } else {
-        alert("Not enough coins or tickets to purchase the Animal Pack.");
-      }
+      imageList = animalsImages;
+      coinsCost = 25;
+      ticketsCost = 25;
+      alertMessage =
+        "Animal Pack images! Consider exchanging 25+ items for a Gem.";
     } else if (type === "Baseball Pack") {
-      availableImages = baseballImages.filter(
-        (img) => !ownedItems.includes(img)
-      );
-      if (availableImages.length === 0) {
-        alert(
-          "You already own all the Baseball Pack images! Consider exchanging 30+ items for a Gem."
-        );
-        return;
-      }
-
-      if (coins >= 25) {
-        const randomBaseball =
-          availableImages[Math.floor(Math.random() * availableImages.length)];
-        setCoins(-25);
-        setOwnedItems((prev) => [...prev, randomBaseball]);
-        tiggerModal(randomBaseball);
-      } else {
-        alert("Not enough coins to purchase the Baseball Pack.");
-      }
+      imageList = baseballImages;
+      coinsCost = 25;
+      ticketsCost = 0;
+      alertMessage =
+        "Baseball Pack images! Consider exchanging 30+ items for a Gem.";
     } else if (
       type === "Pokemon Stellar Coin" ||
       type === "Pokemon Stellar Ticket"
     ) {
-      availableImages = pokemonImages.filter(
-        (img) => !ownedItems.includes(img)
-      );
-      if (availableImages.length === 0) {
-        alert(
-          "You already own all the Pokemon Stellar Crown images! Consider exchanging 20+ items for a Gem."
-        );
-        return;
-      }
+      imageList = pokemonImages;
+      coinsCost = type === "Pokemon Stellar Coin" ? 50 : 0;
+      ticketsCost = type === "Pokemon Stellar Ticket" ? 50 : 0;
+      alertMessage =
+        "Pokemon Stellar Crown images! Consider exchanging 20+ items for a Gem.";
+    }
 
-      if (type === "Pokemon Stellar Coin") {
-        if (coins >= 50) {
-          const randomPokemon =
-            availableImages[Math.floor(Math.random() * availableImages.length)];
-          setCoins(-50);
-          setOwnedItems((prev) => [...prev, randomPokemon]);
-          tiggerModal(randomPokemon);
-        } else {
-          alert("Not enough coins to purchase the Pokemon Pack.");
-        }
-      } else {
-        if (tickets >= 50) {
-          const randomPokemon =
-            availableImages[Math.floor(Math.random() * availableImages.length)];
-          setTickets(-50);
-          setOwnedItems((prev) => [...prev, randomPokemon]);
-          tiggerModal(randomPokemon);
-        } else {
-          alert("Not enough tickets to purchase the Pokemon Pack.");
-        }
-      }
+    availableImages = imageList.filter((img) => !ownedItems.includes(img));
+
+    if (availableImages.length === 0) {
+      // NOTE: Using custom modal/UI instead of alert for production environment
+      alert("You already own all the " + alertMessage);
+      return;
+    }
+
+    if (coins >= coinsCost && tickets >= ticketsCost) {
+      const randomImage =
+        availableImages[Math.floor(Math.random() * availableImages.length)];
+      setCoins(-coinsCost);
+      setTickets(-ticketsCost);
+      setOwnedItems((prev) => [...prev, randomImage]);
+      tiggerModal(randomImage);
+    } else {
+      // NOTE: Using custom modal/UI instead of alert for production environment
+      alert(
+        `Not enough ${coinsCost > 0 ? "coins" : ""}${
+          coinsCost > 0 && ticketsCost > 0 ? " or " : ""
+        }${ticketsCost > 0 ? "tickets" : ""} to purchase the pack.`
+      );
     }
   };
 
@@ -306,16 +164,19 @@ const Shop = ({
     setShowModal(true);
   };
 
-  // Component rendering starts here
   return (
     <div className="container">
+      {/* High Score Display (Left Side) - Now read from Session Storage for simplicity in the Shop view */}
+      <HighScore sessionEndTrigger={sessionEndTrigger} />
+
+      {/* Currency and Navigation Display (Right Side) */}
       <div
         style={{
           position: "absolute",
-          top: 0,
+          top: 10,
           right: 20,
           display: "flex",
-          gap: 8,
+          gap: 15,
         }}
       >
         <a href="#" onClick={() => setPage("game")}>
@@ -323,6 +184,7 @@ const Shop = ({
         </a>
         <span>🪙:{coins}</span>
         <span>🎟️: {tickets}</span>
+        {/* Make Gem display clickable to show history (Correct) */}
         <span
           onClick={toggleGemHistoryModal}
           style={{ cursor: "pointer", fontWeight: "bold" }}
@@ -330,6 +192,7 @@ const Shop = ({
           💎: {gems}
         </span>
       </div>
+
       <h1>Shop</h1>
       <div style={{ display: "flex", justifyContent: "center", gap: 20 }}>
         {/* Animal Pack */}
@@ -354,11 +217,11 @@ const Shop = ({
             Buy Animal Pack
           </button>
 
-          {/* UPDATED Trade-In Button with Progress */}
+          {/* Trade-In Button with Progress */}
           {(() => {
-            const currentCount = getOwnedPackCount(animalImages);
+            const currentCount = getOwnedPackCount(animalsImages);
             const threshold = ANIMAL_THRESHOLD;
-            const isReady = meetsExchangeThreshold(animalImages, threshold);
+            const isReady = meetsExchangeThreshold(animalsImages, threshold);
             const buttonText = isReady
               ? `Exchange ${currentCount} items for 💎 Gem`
               : `Progress: ${currentCount}/${threshold}`;
@@ -368,13 +231,13 @@ const Shop = ({
                 onClick={() =>
                   handleTradeInCollection(
                     "Animal Pack",
-                    animalImages,
+                    animalsImages,
                     threshold
                   )
                 }
                 className="submit-button"
                 style={{
-                  backgroundColor: isReady ? "#20b2aa" : "#808080", // Highlight green when ready, otherwise gray
+                  backgroundColor: isReady ? "#20b2aa" : "#808080",
                   marginTop: "10px",
                 }}
                 disabled={!isReady}
@@ -407,7 +270,7 @@ const Shop = ({
             Buy Baseball Pack
           </button>
 
-          {/* UPDATED Trade-In Button with Progress */}
+          {/* Trade-In Button with Progress */}
           {(() => {
             const currentCount = getOwnedPackCount(baseballImages);
             const threshold = BASEBALL_THRESHOLD;
@@ -479,7 +342,7 @@ const Shop = ({
             </div>
           </div>
 
-          {/* UPDATED Trade-In Button with Progress */}
+          {/* Trade-In Button with Progress */}
           {(() => {
             const currentCount = getOwnedPackCount(pokemonImages);
             const threshold = POKEMON_THRESHOLD;
@@ -534,7 +397,7 @@ const Shop = ({
         </div>
       </div>
 
-      {/* Existing Item Received Modal (omitted for brevity) */}
+      {/* Item Received Modal (omitted for brevity) */}
       {showModal && receivedImage && (
         <div
           style={{
@@ -587,88 +450,9 @@ const Shop = ({
         </div>
       )}
 
-      {/* Gem History Modal (omitted for brevity) */}
+      {/* Gem History Modal - Now imported and used */}
       {showGemHistory && (
-        <div
-          style={{
-            position: "fixed",
-            top: "0",
-            left: "0",
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            zIndex: 1000,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "20px",
-              borderRadius: "8px",
-              textAlign: "center",
-              boxShadow: "0 4px 10px rgba(0, 0, 0, 0.3)",
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-              alignContent: "center",
-              width: "80%",
-              maxWidth: "500px",
-            }}
-          >
-            <h2>Gem Exchange History ({gems} 💎)</h2>
-            {gemHistory.length === 0 ? (
-              <p>No Gems have been exchanged yet.</p>
-            ) : (
-              <ul
-                style={{
-                  listStyleType: "none",
-                  padding: 0,
-                  textAlign: "left",
-                  maxHeight: "300px",
-                  overflowY: "auto",
-                }}
-              >
-                {gemHistory
-                  .slice()
-                  .reverse()
-                  .map((record, index) => (
-                    <li
-                      key={index}
-                      style={{
-                        marginBottom: "10px",
-                        padding: "5px",
-                        borderBottom: "1px solid #eee",
-                      }}
-                    >
-                      <span style={{ fontWeight: "bold" }}>+1 💎</span> from{" "}
-                      {record.collection} on
-                      <br />
-                      <span style={{ fontSize: "0.9em" }}>
-                        {formatTimestamp(record.date)}
-                      </span>
-                    </li>
-                  ))}
-              </ul>
-            )}
-            <button
-              onClick={toggleGemHistoryModal}
-              style={{
-                marginTop: "20px",
-                padding: "10px 20px",
-                backgroundColor: "#4CAF50",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <GemHistoryModal history={gemHistory} onClose={toggleGemHistoryModal} />
       )}
     </div>
   );

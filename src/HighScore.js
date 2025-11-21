@@ -179,7 +179,7 @@ const HighScore = ({ sessionEndTrigger }) => {
       <div
         style={{
           position: "absolute",
-          top: -30,
+          top: 10,
           left: 20,
           display: "flex",
           gap: 8,
