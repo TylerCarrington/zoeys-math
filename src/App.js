@@ -28,6 +28,18 @@ export default function App() {
     });
   };
 
+  const handleCodeRedeem = (code, type, amount, message) => {
+    if (type === "coins") {
+      gameState.persistCoins(amount);
+    } else if (type === "tickets") {
+      gameState.persistTickets(amount);
+    } else if (type === "gems") {
+      gameState.persistGems(amount, `Coupon: ${code}`);
+    }
+    // Optionally, you could show a global notification here based on the message
+    console.log(`Coupon ${code} redeemed: ${message}`);
+  };
+
   if (!userName || page === "name") {
     return <NameEntry onNameSubmit={handleNameSubmit} />;
   } else if (page === "shop") {
@@ -45,6 +57,7 @@ export default function App() {
         persistTickets={gameState.persistTickets}
         persistGems={gameState.persistGems}
         sessionEndTrigger={sessionEndTrigger}
+        onCodeRedeem={handleCodeRedeem}
       />
     );
   } else {
@@ -63,6 +76,7 @@ export default function App() {
         userName={userName}
         sessionEndTrigger={sessionEndTrigger}
         onSessionEnd={handleSessionEnd}
+        onCodeRedeem={handleCodeRedeem}
       />
     );
   }

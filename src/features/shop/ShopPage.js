@@ -16,6 +16,7 @@ export default function ShopPage({
   persistTickets,
   persistGems,
   sessionEndTrigger,
+  onCodeRedeem,
 }) {
   return (
     <div className="">
@@ -42,11 +43,16 @@ export default function ShopPage({
           toggleGemHistoryModal={toggleGemHistoryModal}
           sessionEndTrigger={sessionEndTrigger}
           setPage={setPage}
+          onCodeRedeem={onCodeRedeem} // Pass onCodeRedeem to Shop (if needed) or directly to GemHistoryModal
         />
       </div>
 
       {showGemHistory && (
-        <GemHistoryModal history={gemHistory} onClose={toggleGemHistoryModal} />
+        <GemHistoryModal
+          history={gemHistory}
+          onClose={toggleGemHistoryModal}
+          onCodeRedeem={onCodeRedeem}
+        />
       )}
     </div>
   );

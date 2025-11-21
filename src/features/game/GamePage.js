@@ -17,6 +17,7 @@ export default function GamePage({
   userName,
   sessionEndTrigger,
   onSessionEnd,
+  onCodeRedeem,
 }) {
   const handleSessionEnd = (sessionCoins, sessionTickets) => {
     persistCoins(sessionCoins);
@@ -45,7 +46,11 @@ export default function GamePage({
       </div>
 
       {showGemHistory && (
-        <GemHistoryModal history={gemHistory} onClose={toggleGemHistoryModal} />
+        <GemHistoryModal
+          history={gemHistory}
+          onClose={toggleGemHistoryModal}
+          onCodeRedeem={onCodeRedeem}
+        />
       )}
     </div>
   );

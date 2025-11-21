@@ -9,52 +9,50 @@ const getPeriodKey = (type) => {
   const now = new Date();
   if (type === "daily") return now.toDateString();
   if (type === "weekly") {
-    // Start of the week (Sunday) - use a new Date to avoid mutation
+    // Start of the week (Sunday) - use a a new Date to avoid mutation
     const weekStart = new Date(now);
     weekStart.setDate(weekStart.getDate() - weekStart.getDay());
     return weekStart.toDateString();
   }
   if (type === "monthly") return `${now.getFullYear()}-${now.getMonth()}`;
-  return "allTime";
+  return "allTime"; // Should not be called for 'allTime' in this context, but as a fallback
 };
 
 /**
- * Loads high scores from localStorage based on current time periods.
+ * Loads high scores from localStorage based on current time periods
+ * in a single streamlined entry.
  */
 const loadHighScores = () => {
-  const allTime = JSON.parse(localStorage.getItem("highScore_allTime")) || {
-    coins: 0,
-    coinTimestamp: null,
-    tickets: 0,
-    ticketTimestamp: null,
+  const storedData = JSON.parse(localStorage.getItem("allHighScoresData")) || {};
+
+  const now = Date.now();
+
+  // Initialize default structure for each period if not present or needs reset
+  const initializePeriodScore = (currentScore, periodType) => {
+    const periodKey = getPeriodKey(periodType);
+    const defaultScore = {
+      coins: 0,
+      coinTimestamp: null,
+      tickets: 0,
+      ticketTimestamp: null,
+      dateKey: periodKey, // Store the date key to check for resets
+    };
+
+    if (
+      !currentScore ||
+      (periodType !== "allTime" && currentScore.dateKey !== periodKey)
+    ) {
+      // Reset if no score or period key has changed (new day/week/month)
+      return defaultScore;
+    }
+    // If period key matches or it's allTime, keep existing score but update dateKey if needed (for allTime it won't matter)
+    return { ...currentScore, dateKey: periodKey };
   };
 
-  // Get keys for current period
-  const dailyKey = getPeriodKey("daily");
-  const weeklyKey = getPeriodKey("weekly");
-  const monthlyKey = getPeriodKey("monthly");
-
-  // Load scores for current periods
-  const daily = JSON.parse(localStorage.getItem(`highScore_${dailyKey}`)) || {
-    coins: 0,
-    coinTimestamp: null,
-    tickets: 0,
-    ticketTimestamp: null,
-  };
-  const weekly = JSON.parse(localStorage.getItem(`highScore_${weeklyKey}`)) || {
-    coins: 0,
-    coinTimestamp: null,
-    tickets: 0,
-    ticketTimestamp: null,
-  };
-  const monthly = JSON.parse(
-    localStorage.getItem(`highScore_${monthlyKey}`)
-  ) || {
-    coins: 0,
-    coinTimestamp: null,
-    tickets: 0,
-    ticketTimestamp: null,
-  };
+  const daily = initializePeriodScore(storedData.daily, "daily");
+  const weekly = initializePeriodScore(storedData.weekly, "weekly");
+  const monthly = initializePeriodScore(storedData.monthly, "monthly");
+  const allTime = initializePeriodScore(storedData.allTime, "allTime"); // allTime doesn't reset by dateKey
 
   return { daily, weekly, monthly, allTime };
 };
@@ -120,6 +118,8 @@ const HighScore = ({ sessionEndTrigger }) => {
     if (sessionCoins === 0 && sessionTickets === 0) return;
 
     const now = Date.now();
+    const updatedScores = { ...highScores }; // Start with current scores
+
     const periods = [
       { type: "daily", key: getPeriodKey("daily") },
       { type: "weekly", key: getPeriodKey("weekly") },
@@ -127,52 +127,50 @@ const HighScore = ({ sessionEndTrigger }) => {
       { type: "allTime", key: "allTime" },
     ];
 
-    let updated = false;
-    const newScores = {};
+    let changed = false;
 
     periods.forEach(({ type, key }) => {
-      const storageKey = `highScore_${key}`;
-      // Retrieve current high score from storage
-      const currentHigh = JSON.parse(localStorage.getItem(storageKey)) || {
-        coins: 0,
-        coinTimestamp: null,
-        tickets: 0,
-        ticketTimestamp: null,
-      };
+      let currentHigh = updatedScores[type];
 
-      let updatedScore = currentHigh;
+      // Reset period scores if the dateKey doesn't match the current period
+      if (type !== "allTime" && currentHigh.dateKey !== key) {
+        currentHigh = {
+          coins: 0,
+          coinTimestamp: null,
+          tickets: 0,
+          ticketTimestamp: null,
+          dateKey: key,
+        };
+        changed = true;
+      }
 
       // Update coins high score if the new session score is strictly better
       if (sessionCoins > currentHigh.coins) {
-        updatedScore = {
-          ...updatedScore,
+        currentHigh = {
+          ...currentHigh,
           coins: sessionCoins,
           coinTimestamp: now,
         };
-        updated = true;
+        changed = true;
       }
 
       // Update tickets high score if the new session score is strictly better
       if (sessionTickets > currentHigh.tickets) {
-        updatedScore = {
-          ...updatedScore,
+        currentHigh = {
+          ...currentHigh,
           tickets: sessionTickets,
           ticketTimestamp: now,
         };
-        updated = true;
+        changed = true;
       }
-
-      newScores[type] = updatedScore;
-      localStorage.setItem(storageKey, JSON.stringify(updatedScore));
+      updatedScores[type] = currentHigh;
     });
 
-    // Only update state if a new high score was achieved, otherwise just reload to refresh keys
-    if (updated) {
-      setHighScores(newScores);
-    } else {
-      setHighScores(loadHighScores());
+    if (changed) {
+      setHighScores(updatedScores);
+      localStorage.setItem("allHighScoresData", JSON.stringify(updatedScores));
     }
-  }, []);
+  }, [highScores]); // Depend on highScores to ensure we get the latest state
 
   // Effect to run the high score update logic after a game session ends
   useEffect(() => {
@@ -181,9 +179,34 @@ const HighScore = ({ sessionEndTrigger }) => {
     }
   }, [sessionEndTrigger, updateHighScores]);
 
-  // Ensure current period scores are loaded on mount
+  // On mount, load scores and clean up old local storage entries
   useEffect(() => {
     setHighScores(loadHighScores());
+
+    // Clean up old local storage entries
+    const oldKeys = [
+      "highScore_allTime",
+      // Add other patterns for old daily/weekly/monthly keys if you know them
+      // For example, if they were consistently named like "highScore_Sun Nov 16 2025"
+      // it's hard to remove them without iterating through all local storage keys.
+      // For now, we'll remove the main one, and others will naturally stop being used.
+    ];
+    oldKeys.forEach((key) => localStorage.removeItem(key));
+
+    // Attempt to remove common date-based old keys if they exist
+    const now = new Date();
+    for (let i = 0; i < 365; i++) { // Check for a year's worth of daily/weekly keys
+        const d = new Date(now);
+        d.setDate(now.getDate() - i);
+        localStorage.removeItem(`highScore_${d.toDateString()}`);
+        
+        const weekStart = new Date(d);
+        weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+        localStorage.removeItem(`highScore_${weekStart.toDateString()}`);
+        
+        localStorage.removeItem(`highScore_${d.getFullYear()}-${d.getMonth()}`);
+    }
+
   }, []);
 
   const todaysHigh = highScores.daily;
