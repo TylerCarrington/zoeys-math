@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 // Function to generate a random math problem
 const generateMathProblem = (selectedOperators) => {
@@ -52,27 +52,30 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
   ]);
   const [sessionCoins, setSessionCoins] = useState(0);
   const [sessionTickets, setSessionTickets] = useState(0);
+  
+  // Use ref to track if we've already called onSessionEnd for this session
+  const sessionEndedRef = useRef(false);
 
   useEffect(() => {
     let interval;
 
     if (isTimerRunning && timer > 0) {
       interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
-    } else if (timer === 0) {
+    } else if (timer === 0 && isTimerRunning && !sessionEndedRef.current) {
       setFeedback(
         `Time's up! Coins (🪙) earned: ${sessionCoins}, Tickets (🎟️) earned: ${sessionTickets}`
       );
 
-      if (isTimerRunning) {
-        onSessionEnd(sessionCoins, sessionTickets);
-        setIsTimerRunning(false);
-      }
+      onSessionEnd(sessionCoins, sessionTickets);
+      sessionEndedRef.current = true;
+      setIsTimerRunning(false);
     }
 
     return () => clearInterval(interval);
-  }, [isTimerRunning, timer, correctCount, incorrectCount]);
+  }, [isTimerRunning, timer, sessionCoins, sessionTickets, onSessionEnd]);
 
   const startTimer = useCallback(() => {
+    sessionEndedRef.current = false; // Reset the ref for new session
     setIsTimerRunning(true);
     setTimer(60);
     // The component will correctly use the latest selectedOperators when this function is called

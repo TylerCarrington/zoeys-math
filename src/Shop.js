@@ -4,8 +4,7 @@ import { animalsImages } from "./image-lists/animals";
 import { baseballImages } from "./image-lists/baseball";
 import { pokemonImages } from "./image-lists/pokemon";
 // 2. IMPORT THE NEW STANDALONE MODAL
-import GemHistoryModal from "./GemHistoryModal";
-import HighScore from "./HighScore";
+// Shop UI: relies on top-level Header for HighScore and currency UI
 
 // Define Threshold Constants
 const ANIMAL_THRESHOLD = 25;
@@ -166,32 +165,7 @@ const Shop = ({
 
   return (
     <div className="container">
-      {/* High Score Display (Left Side) - Now read from Session Storage for simplicity in the Shop view */}
-      <HighScore sessionEndTrigger={sessionEndTrigger} />
-
-      {/* Currency and Navigation Display (Right Side) */}
-      <div
-        style={{
-          position: "absolute",
-          top: 10,
-          right: 20,
-          display: "flex",
-          gap: 15,
-        }}
-      >
-        <a href="#" onClick={() => setPage("game")}>
-          Back to Game
-        </a>
-        <span>🪙:{coins}</span>
-        <span>🎟️: {tickets}</span>
-        {/* Make Gem display clickable to show history (Correct) */}
-        <span
-          onClick={toggleGemHistoryModal}
-          style={{ cursor: "pointer", fontWeight: "bold" }}
-        >
-          💎: {gems}
-        </span>
-      </div>
+      {/* Header handles HighScore, navigation and currency display */}
 
       <h1>Shop</h1>
       <div style={{ display: "flex", justifyContent: "center", gap: 20 }}>
@@ -451,9 +425,7 @@ const Shop = ({
       )}
 
       {/* Gem History Modal - Now imported and used */}
-      {showGemHistory && (
-        <GemHistoryModal history={gemHistory} onClose={toggleGemHistoryModal} />
-      )}
+      {/* Gem history modal is rendered at top-level by App */}
     </div>
   );
 };

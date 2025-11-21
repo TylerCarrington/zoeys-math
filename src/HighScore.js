@@ -9,9 +9,10 @@ const getPeriodKey = (type) => {
   const now = new Date();
   if (type === "daily") return now.toDateString();
   if (type === "weekly") {
-    // Start of the week (Sunday)
-    const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
-    return startOfWeek.toDateString();
+    // Start of the week (Sunday) - use a new Date to avoid mutation
+    const weekStart = new Date(now);
+    weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+    return weekStart.toDateString();
   }
   if (type === "monthly") return `${now.getFullYear()}-${now.getMonth()}`;
   return "allTime";
@@ -23,8 +24,9 @@ const getPeriodKey = (type) => {
 const loadHighScores = () => {
   const allTime = JSON.parse(localStorage.getItem("highScore_allTime")) || {
     coins: 0,
+    coinTimestamp: null,
     tickets: 0,
-    timestamp: null,
+    ticketTimestamp: null,
   };
 
   // Get keys for current period
@@ -35,17 +37,24 @@ const loadHighScores = () => {
   // Load scores for current periods
   const daily = JSON.parse(localStorage.getItem(`highScore_${dailyKey}`)) || {
     coins: 0,
+    coinTimestamp: null,
     tickets: 0,
-    timestamp: null,
+    ticketTimestamp: null,
   };
   const weekly = JSON.parse(localStorage.getItem(`highScore_${weeklyKey}`)) || {
     coins: 0,
+    coinTimestamp: null,
     tickets: 0,
-    timestamp: null,
+    ticketTimestamp: null,
   };
   const monthly = JSON.parse(
     localStorage.getItem(`highScore_${monthlyKey}`)
-  ) || { coins: 0, tickets: 0, timestamp: null };
+  ) || {
+    coins: 0,
+    coinTimestamp: null,
+    tickets: 0,
+    ticketTimestamp: null,
+  };
 
   return { daily, weekly, monthly, allTime };
 };
@@ -75,6 +84,7 @@ const HighScoreModal = ({ highScoreData, onClose }) => {
             <tr>
               <th>Category</th>
               <th>Coins 🪙</th>
+              <th>Achieved On</th>
               <th>Tickets 🎟️</th>
               <th>Achieved On</th>
             </tr>
@@ -84,10 +94,9 @@ const HighScoreModal = ({ highScoreData, onClose }) => {
               <tr key={category.key}>
                 <td>{category.label}</td>
                 <td>{highScoreData[category.key]?.coins || 0}</td>
+                <td>{formatTimestamp(highScoreData[category.key]?.coinTimestamp)}</td>
                 <td>{highScoreData[category.key]?.tickets || 0}</td>
-                <td>
-                  {formatTimestamp(highScoreData[category.key]?.timestamp)}
-                </td>
+                <td>{formatTimestamp(highScoreData[category.key]?.ticketTimestamp)}</td>
               </tr>
             ))}
           </tbody>
@@ -126,15 +135,20 @@ const HighScore = ({ sessionEndTrigger }) => {
       // Retrieve current high score from storage
       const currentHigh = JSON.parse(localStorage.getItem(storageKey)) || {
         coins: 0,
+        coinTimestamp: null,
         tickets: 0,
-        timestamp: null,
+        ticketTimestamp: null,
       };
 
       let updatedScore = currentHigh;
 
       // Update coins high score if the new session score is strictly better
       if (sessionCoins > currentHigh.coins) {
-        updatedScore = { ...updatedScore, coins: sessionCoins, timestamp: now };
+        updatedScore = {
+          ...updatedScore,
+          coins: sessionCoins,
+          coinTimestamp: now,
+        };
         updated = true;
       }
 
@@ -143,7 +157,7 @@ const HighScore = ({ sessionEndTrigger }) => {
         updatedScore = {
           ...updatedScore,
           tickets: sessionTickets,
-          timestamp: now,
+          ticketTimestamp: now,
         };
         updated = true;
       }
