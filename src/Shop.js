@@ -76,20 +76,20 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
     "./images/baseball/baseball36.jpeg",
     "./images/baseball/baseball37.jpeg",
     "./images/baseball/baseball38.webp",
-    "./images/baseball/baseball39.jpeg",
-    "./images/baseball/baseball40.jpeg",
-    "./images/baseball/baseball41.jpeg",
-    "./images/baseball/baseball42.jpeg",
-    "./images/baseball/baseball43.jpeg",
-    "./images/baseball/baseball44.jpeg",
-    "./images/baseball/baseball45.jpeg",
-    "./images/baseball/baseball46.jpeg",
-    "./images/baseball/baseball47.jpeg",
-    "./images/baseball/baseball48.jpeg",
-    "./images/baseball/baseball49.jpeg",
-    "./images/baseball/baseball50.jpeg",
-    "./images/baseball/baseball51.jpeg",
-    "./images/baseball/baseball52.jpeg",
+    "./images/baseball/baseball39.jpg",
+    "./images/baseball/baseball40.jpg",
+    "./images/baseball/baseball41.jpg",
+    "./images/baseball/baseball42.jpg",
+    "./images/baseball/baseball43.jpg",
+    "./images/baseball/baseball44.jpg",
+    "./images/baseball/baseball45.jpg",
+    "./images/baseball/baseball46.jpg",
+    "./images/baseball/baseball47.jpg",
+    "./images/baseball/baseball48.jpg",
+    "./images/baseball/baseball49.jpg",
+    "./images/baseball/baseball50.jpg",
+    "./images/baseball/baseball51.jpg",
+    "./images/baseball/baseball52.jpg",
     "./images/baseball/owen1.png",
   ];
 
@@ -290,7 +290,7 @@ const Shop = ({ coins, tickets, setCoins, setTickets, setPage }) => {
           </button>
         </div>
         <div>
-          <h2>Baseball Pack</h2>
+          <h2>Pokemon Pack</h2>
           <img
             src={"./images/packs/stellar-crown.jpg"}
             alt="Stellar Crown Item"
