@@ -5,9 +5,10 @@
   "homepage": "./",
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-app-rewired build",
+    "build": "npm run generate:images && react-app-rewired build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generate:images": "node scripts/generateImageLists.js"
   },
   "dependencies": {
     "react": "^18.0.0",

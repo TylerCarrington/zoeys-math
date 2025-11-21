@@ -25,6 +25,10 @@
     "eject": {
       "name": "eject",
       "command": "yarn eject"
+    },
+    "images": {
+      "name": "images",
+      "command":"npm run generate:images"
     }
   }
 }
