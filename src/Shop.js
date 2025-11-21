@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 
 // 1. Define Threshold Constants
 const ANIMAL_THRESHOLD = 25;
-const BASEBALL_THRESHOLD = 30;
+const BASEBALL_THRESHOLD = 40;
 const POKEMON_THRESHOLD = 20;
 
 // UPDATED PROPS: Included props for Gem functionality and history
