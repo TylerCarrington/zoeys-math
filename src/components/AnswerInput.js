@@ -4,7 +4,7 @@ function AnswerInput({ userAnswer, handleAnswerChange, handleKeyDown, handleSubm
   return (
     <div className="input-container">
       <input
-        type="text"
+        type="number"
         value={userAnswer}
         onChange={handleAnswerChange}
         onKeyDown={handleKeyDown}
