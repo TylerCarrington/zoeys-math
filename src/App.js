@@ -28,13 +28,15 @@ export default function App() {
     });
   };
 
-  const handleCodeRedeem = (code, type, amount, message) => {
+  const handleCodeRedeem = (code, type, amount, message, card) => {
     if (type === "coins") {
       gameState.persistCoins(amount);
     } else if (type === "tickets") {
       gameState.persistTickets(amount);
     } else if (type === "gems") {
       gameState.persistGems(amount, `Coupon: ${code}`);
+    } else if (type === "card" && card) {
+      gameState.unlockCard(card);
     }
     // Optionally, you could show a global notification here based on the message
     console.log(`Coupon ${code} redeemed: ${message}`);

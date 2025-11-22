@@ -6,7 +6,7 @@ import ShopItem from "./ShopItem";
 import PokemonPackPurchaseOptions from "./PokemonPackPurchaseOptions";
 
 const ANIMAL_THRESHOLD = 25;
-const BASEBALL_THRESHOLD = 30;
+const BASEBALL_THRESHOLD = 40;
 const POKEMON_THRESHOLD = 20;
 
 const Shop = ({

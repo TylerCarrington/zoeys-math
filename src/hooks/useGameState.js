@@ -12,6 +12,9 @@ export function useGameState() {
     JSON.parse(localStorage.getItem("gemHistory")) || []
   );
   const [showGemHistory, setShowGemHistory] = useState(false);
+  const [ownedItems, setOwnedItems] = useState(
+    JSON.parse(localStorage.getItem("ownedItems")) || []
+  );
 
   const persistGems = (amount, source) => {
     setGems((prevGems) => {
@@ -50,15 +53,29 @@ export function useGameState() {
     setShowGemHistory((prev) => !prev);
   };
 
+  const unlockCard = (cardPath) => {
+    setOwnedItems((prevItems) => {
+      // Check if card is already owned
+      if (prevItems.includes(cardPath)) {
+        return prevItems;
+      }
+      const newItems = [...prevItems, cardPath];
+      localStorage.setItem("ownedItems", JSON.stringify(newItems));
+      return newItems;
+    });
+  };
+
   return {
     coins,
     tickets,
     gems,
     gemHistory,
     showGemHistory,
+    ownedItems,
     persistGems,
     persistCoins,
     persistTickets,
     toggleGemHistoryModal,
+    unlockCard,
   };
 }

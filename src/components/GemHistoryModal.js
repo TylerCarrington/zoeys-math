@@ -34,7 +34,7 @@ const GemHistoryModal = ({ history, onClose, onCodeRedeem }) => {
     const codeData = couponCodes[code];
 
     if (codeData) {
-      onCodeRedeem(code, codeData.type, codeData.amount, codeData.message);
+      onCodeRedeem(code, codeData.type, codeData.amount || codeData.card, codeData.message, codeData.card);
       setCouponFeedback(`Coupon redeemed! You received ${codeData.message}`);
 
       // Add code to used codes and store in local storage
