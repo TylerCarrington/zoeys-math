@@ -15,6 +15,9 @@ export function useGameState() {
   const [ownedItems, setOwnedItems] = useState(
     JSON.parse(localStorage.getItem("ownedItems")) || []
   );
+  const [lockedItems, setLockedItems] = useState(
+    JSON.parse(localStorage.getItem("lockedItems")) || {}
+  );
 
   const persistGems = (amount, source) => {
     setGems((prevGems) => {
@@ -65,6 +68,40 @@ export function useGameState() {
     });
   };
 
+  const lockCard = (cardPath) => {
+    if (gems <= 0) return false;
+
+    setLockedItems((prevLocked) => {
+      const newLocked = { ...prevLocked };
+      newLocked[cardPath] = {
+        lockedAt: Date.now(),
+        gemSpent: 1,
+      };
+      localStorage.setItem("lockedItems", JSON.stringify(newLocked));
+      return newLocked;
+    });
+
+    // Deduct gem
+    persistGems(-1, `Card Lock: ${cardPath}`);
+    return true;
+  };
+
+  const unlockCardLock = (cardPath) => {
+    setLockedItems((prevLocked) => {
+      const newLocked = { ...prevLocked };
+      delete newLocked[cardPath];
+      localStorage.setItem("lockedItems", JSON.stringify(newLocked));
+      return newLocked;
+    });
+
+    // Refund gem
+    persistGems(1, `Card Unlock: ${cardPath}`);
+  };
+
+  const isCardLocked = (cardPath) => {
+    return lockedItems.hasOwnProperty(cardPath);
+  };
+
   return {
     coins,
     tickets,
@@ -72,10 +109,14 @@ export function useGameState() {
     gemHistory,
     showGemHistory,
     ownedItems,
+    lockedItems,
     persistGems,
     persistCoins,
     persistTickets,
     toggleGemHistoryModal,
     unlockCard,
+    lockCard,
+    unlockCardLock,
+    isCardLocked,
   };
 }

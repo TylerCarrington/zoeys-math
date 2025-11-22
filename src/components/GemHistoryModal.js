@@ -19,6 +19,20 @@ const GemHistoryModal = ({ history, onClose, onCodeRedeem }) => {
     });
   };
 
+  const formatSource = (source) => {
+    // Parse lock/unlock transactions
+    if (source.startsWith("Card Lock:")) {
+      return "🔒 Card Locked";
+    }
+    if (source.startsWith("Card Unlock:")) {
+      return "🔓 Card Unlocked";
+    }
+    if (source.startsWith("Coupon:")) {
+      return `💬 ${source}`;
+    }
+    return source;
+  };
+
   const handleCodeSubmit = () => {
     const code = couponCode.toUpperCase().trim();
     setCouponCode(""); // Clear the input field
@@ -80,7 +94,7 @@ const GemHistoryModal = ({ history, onClose, onCodeRedeem }) => {
                         {entry.amount > 0 ? `+${entry.amount}` : entry.amount}{" "}
                         💎
                       </td>
-                      <td>{entry.source}</td>
+                      <td>{formatSource(entry.source)}</td>
                       <td>{formatTimestamp(entry.timestamp)}</td>
                     </tr>
                   )

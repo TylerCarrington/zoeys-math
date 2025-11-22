@@ -6,7 +6,7 @@ import ShopItem from "./ShopItem";
 import PokemonPackPurchaseOptions from "./PokemonPackPurchaseOptions";
 
 const ANIMAL_THRESHOLD = 25;
-const BASEBALL_THRESHOLD = 40;
+const BASEBALL_THRESHOLD = 4;
 const POKEMON_THRESHOLD = 20;
 
 const Shop = ({
@@ -21,6 +21,9 @@ const Shop = ({
   showGemHistory,
   toggleGemHistoryModal,
   sessionEndTrigger,
+  lockCard,
+  unlockCardLock,
+  isCardLocked,
 }) => {
   const [showModal, setShowModal] = useState(false);
   const [receivedImage, setReceivedImage] = useState("");
@@ -67,19 +70,24 @@ const Shop = ({
     const itemsToExchangeCount = getOwnedPackCount(packImages);
 
     const confirmation = window.confirm(
-      `Are you sure you want to trade in ALL ${itemsToExchangeCount} items from your ${packType} collection for ${gemReward} 💎 Gem? This will remove all of these items from your gallery.`
+      `Are you sure you want to trade in ALL ${itemsToExchangeCount} items from your ${packType} collection for ${gemReward} 💎 Gem? This will remove all of these items from your gallery (except locked items).`
     );
 
     if (confirmation) {
       persistGems(gemReward, packType);
 
+      // Filter out all items that belong to the traded-in pack, but keep locked items
       const newOwnedItems = ownedItems.filter(
-        (item) => !packImages.includes(item)
+        (item) => !packImages.includes(item) || isCardLocked(item)
       );
       setOwnedItems(newOwnedItems);
 
+      const lockedCount = ownedItems.filter(
+        (item) => packImages.includes(item) && isCardLocked(item)
+      ).length;
+
       alert(
-        `Collection successfully traded in! You exchanged ${itemsToExchangeCount} items and received ${gemReward} 💎 Gem. Your ${packType} collection has been reset.`
+        `Collection successfully traded in! You exchanged ${itemsToExchangeCount - lockedCount} items and received ${gemReward} 💎 Gem. Your ${packType} collection has been reset (${lockedCount} locked items remained).`
       );
     }
   };
@@ -207,18 +215,45 @@ const Shop = ({
         <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
           {ownedItems.length > 0 ? (
             ownedItems.map((item, index) => (
-              <img
+              <div
                 key={index}
-                src={item}
-                alt="Owned Item"
                 style={{
+                  position: "relative",
                   width: "100px",
                   height: "100px",
-                  objectFit: "contain",
-                  cursor: "pointer",
                 }}
-                onClick={() => tiggerModal(item)}
-              />
+              >
+                <img
+                  src={item}
+                  alt="Owned Item"
+                  style={{
+                    width: "100px",
+                    height: "100px",
+                    objectFit: "contain",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => tiggerModal(item)}
+                />
+                {isCardLocked(item) && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "5px",
+                      right: "5px",
+                      fontSize: "20px",
+                      backgroundColor: "rgba(255, 255, 255, 0.9)",
+                      borderRadius: "50%",
+                      width: "24px",
+                      height: "24px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    🔒
+                  </div>
+                )}
+              </div>
             ))
           ) : (
             <p>You don't own any items yet.</p>
@@ -260,20 +295,58 @@ const Shop = ({
               alt="Received Item"
               style={{ width: "450px", height: "450px", objectFit: "contain" }}
             />
-            <button
-              onClick={closeModal}
-              style={{
-                marginTop: "20px",
-                padding: "10px 20px",
-                backgroundColor: "#4CAF50",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Close
-            </button>
+            <div style={{ display: "flex", gap: "10px", justifyContent: "center" }}>
+              {isCardLocked(receivedImage) ? (
+                <button
+                  onClick={() => {
+                    unlockCardLock(receivedImage);
+                    closeModal();
+                  }}
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: "#FF9800",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                >
+                  🔓 Unlock Card (Refund 1 💎)
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    if (lockCard(receivedImage)) {
+                      closeModal();
+                    }
+                  }}
+                  disabled={gems <= 0}
+                  style={{
+                    padding: "10px 20px",
+                    backgroundColor: gems > 0 ? "#2196F3" : "#CCCCCC",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: gems > 0 ? "pointer" : "not-allowed",
+                  }}
+                >
+                  🔒 Lock Card (1 💎)
+                </button>
+              )}
+              <button
+                onClick={closeModal}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

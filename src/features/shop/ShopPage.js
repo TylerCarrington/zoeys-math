@@ -17,6 +17,9 @@ export default function ShopPage({
   persistGems,
   sessionEndTrigger,
   onCodeRedeem,
+  lockCard,
+  unlockCardLock,
+  isCardLocked,
 }) {
   return (
     <div className="">
@@ -43,7 +46,10 @@ export default function ShopPage({
           toggleGemHistoryModal={toggleGemHistoryModal}
           sessionEndTrigger={sessionEndTrigger}
           setPage={setPage}
-          onCodeRedeem={onCodeRedeem} // Pass onCodeRedeem to Shop (if needed) or directly to GemHistoryModal
+          onCodeRedeem={onCodeRedeem}
+          lockCard={lockCard}
+          unlockCardLock={unlockCardLock}
+          isCardLocked={isCardLocked}
         />
       </div>
 

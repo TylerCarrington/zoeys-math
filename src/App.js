@@ -60,6 +60,9 @@ export default function App() {
         persistGems={gameState.persistGems}
         sessionEndTrigger={sessionEndTrigger}
         onCodeRedeem={handleCodeRedeem}
+        lockCard={gameState.lockCard}
+        unlockCardLock={gameState.unlockCardLock}
+        isCardLocked={gameState.isCardLocked}
       />
     );
   } else {
