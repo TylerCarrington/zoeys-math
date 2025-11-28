@@ -42,6 +42,8 @@ export default function App() {
       gameState.persistCoins(amount);
     } else if (type === "tickets") {
       gameState.persistTickets(amount);
+    } else if (type === "moneyBags") { // Added moneyBags redemption
+      gameState.persistMoneyBags(amount);
     } else if (type === "gems") {
       gameState.persistGems(amount, `Coupon: ${code}`);
     } else if (type === "card" && card) {
@@ -68,6 +70,7 @@ export default function App() {
         persistCoins={gameState.persistCoins}
         persistTickets={gameState.persistTickets}
         persistGems={gameState.persistGems}
+        persistMoneyBags={gameState.persistMoneyBags} // Ensure persistMoneyBags is passed
         sessionEndTrigger={sessionEndTrigger}
         onCodeRedeem={handleCodeRedeem}
         lockCard={gameState.lockCard}

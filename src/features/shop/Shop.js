@@ -13,8 +13,10 @@ const POKEMON_THRESHOLD = 20;
 const Shop = ({
   coins,
   tickets,
+  moneyBags,
   setCoins,
   setTickets,
+  setMoneyBags,
   gems,
   persistGems,
   setPage,
@@ -152,14 +154,14 @@ const Shop = ({
   };
 
   const handlePurchaseWallpaperColor = () => {
-    if (coins >= 50) {
+    if (moneyBags >= 50) { // Changed from coins to moneyBags
       const randomColor = getRandomWallpaperColor();
-      setCoins(-50);
+      setMoneyBags(-50); // Changed from setCoins to setMoneyBags
       addWallpaperColor(randomColor);
       setNewWallpaperColor(randomColor);
       setShowWallpaperModal(true);
     } else {
-      alert("Not enough coins (50 required) to purchase a wallpaper color.");
+      alert("Not enough money bags (50 required) to purchase a wallpaper color."); // Updated alert message
     }
   };
 
@@ -265,13 +267,13 @@ const Shop = ({
             🎨
           </div>
           <p style={{ margin: "5px 0", fontSize: "14px" }}>
-            Cost: 🪙 50
+            Cost: 💰 50
           </p>
           <button
             onClick={handlePurchaseWallpaperColor}
-            disabled={coins < 50}
+            disabled={moneyBags < 50} // Changed from coins to moneyBags
             style={
-              coins < 50
+              moneyBags < 50
                 ? { backgroundColor: "lightgray", cursor: "not-allowed" }
                 : {
                     backgroundColor: "#4CAF50",
@@ -283,7 +285,7 @@ const Shop = ({
                   }
             }
           >
-            {coins < 50 ? "Can't Afford" : "Purchase"}
+            {moneyBags < 50 ? "Can't Afford" : "Purchase"}
           </button>
         </div>
       </div>

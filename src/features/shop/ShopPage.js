@@ -16,6 +16,7 @@ export default function ShopPage({
   persistCoins,
   persistTickets,
   persistGems,
+  persistMoneyBags, // Add persistMoneyBags to destructuring
   sessionEndTrigger,
   onCodeRedeem,
   lockCard,
@@ -43,9 +44,11 @@ export default function ShopPage({
         <Shop
           coins={coins}
           tickets={tickets}
+          moneyBags={moneyBags}
           gems={gems}
           setCoins={persistCoins}
           setTickets={persistTickets}
+          setMoneyBags={persistMoneyBags} // Pass persistMoneyBags as setMoneyBags
           persistGems={persistGems}
           gemHistory={gemHistory}
           showGemHistory={showGemHistory}
