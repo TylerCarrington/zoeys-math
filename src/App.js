@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NameEntry from "./components/NameEntry";
 import GamePage from "./features/game/GamePage";
 import ShopPage from "./features/shop/ShopPage";
@@ -12,6 +12,13 @@ export default function App() {
   const [sessionEndTrigger, setSessionEndTrigger] = useState(null);
 
   const gameState = useGameState();
+
+  // Apply wallpaper color to body background
+  useEffect(() => {
+    if (gameState.activeWallpaperColor) {
+      document.body.style.backgroundColor = gameState.activeWallpaperColor;
+    }
+  }, [gameState.activeWallpaperColor]);
 
   const handleNameSubmit = (name) => {
     setUserName(name);
@@ -66,6 +73,10 @@ export default function App() {
         lockCard={gameState.lockCard}
         unlockCardLock={gameState.unlockCardLock}
         isCardLocked={gameState.isCardLocked}
+        ownedWallpaperColors={gameState.ownedWallpaperColors}
+        activeWallpaperColor={gameState.activeWallpaperColor}
+        addWallpaperColor={gameState.addWallpaperColor}
+        setWallpaperColor={gameState.setWallpaperColor}
       />
     );
   } else {

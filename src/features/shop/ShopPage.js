@@ -21,6 +21,10 @@ export default function ShopPage({
   lockCard,
   unlockCardLock,
   isCardLocked,
+  ownedWallpaperColors,
+  activeWallpaperColor,
+  addWallpaperColor,
+  setWallpaperColor,
 }) {
   return (
     <div className="">
@@ -52,6 +56,10 @@ export default function ShopPage({
           lockCard={lockCard}
           unlockCardLock={unlockCardLock}
           isCardLocked={isCardLocked}
+          ownedWallpaperColors={ownedWallpaperColors}
+          activeWallpaperColor={activeWallpaperColor}
+          addWallpaperColor={addWallpaperColor}
+          setWallpaperColor={setWallpaperColor}
         />
       </div>
 

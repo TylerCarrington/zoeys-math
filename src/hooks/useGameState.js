@@ -21,6 +21,12 @@ export function useGameState() {
   const [lockedItems, setLockedItems] = useState(
     JSON.parse(localStorage.getItem("lockedItems")) || {}
   );
+  const [ownedWallpaperColors, setOwnedWallpaperColors] = useState(
+    JSON.parse(localStorage.getItem("ownedWallpaperColors")) || []
+  );
+  const [activeWallpaperColor, setActiveWallpaperColor] = useState(
+    localStorage.getItem("activeWallpaperColor") || null
+  );
 
   const persistGems = (amount, source) => {
     setGems((prevGems) => {
@@ -112,6 +118,22 @@ export function useGameState() {
     return lockedItems.hasOwnProperty(cardPath);
   };
 
+  const addWallpaperColor = (color) => {
+    setOwnedWallpaperColors((prevColors) => {
+      if (prevColors.includes(color)) {
+        return prevColors;
+      }
+      const newColors = [...prevColors, color];
+      localStorage.setItem("ownedWallpaperColors", JSON.stringify(newColors));
+      return newColors;
+    });
+  };
+
+  const setWallpaperColor = (color) => {
+    localStorage.setItem("activeWallpaperColor", color);
+    setActiveWallpaperColor(color);
+  };
+
   return {
     coins,
     tickets,
@@ -121,6 +143,8 @@ export function useGameState() {
     showGemHistory,
     ownedItems,
     lockedItems,
+    ownedWallpaperColors,
+    activeWallpaperColor,
     persistGems,
     persistCoins,
     persistTickets,
@@ -130,5 +154,7 @@ export function useGameState() {
     lockCard,
     unlockCardLock,
     isCardLocked,
+    addWallpaperColor,
+    setWallpaperColor,
   };
 }
