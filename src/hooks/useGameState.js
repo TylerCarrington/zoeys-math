@@ -7,6 +7,9 @@ export function useGameState() {
   const [tickets, setTickets] = useState(
     parseInt(localStorage.getItem("tickets")) || 0
   );
+  const [moneyBags, setMoneyBags] = useState(
+    parseInt(localStorage.getItem("moneyBags")) || 0
+  );
   const [gems, setGems] = useState(parseInt(localStorage.getItem("gems")) || 0);
   const [gemHistory, setGemHistory] = useState(
     JSON.parse(localStorage.getItem("gemHistory")) || []
@@ -50,6 +53,13 @@ export function useGameState() {
       parseInt(localStorage.getItem("tickets") || "0") + sessionTickets;
     localStorage.setItem("tickets", totalTickets);
     setTickets((prev) => prev + sessionTickets);
+  };
+
+  const persistMoneyBags = (sessionMoneyBags) => {
+    const totalMoneyBags =
+      parseInt(localStorage.getItem("moneyBags") || "0") + sessionMoneyBags;
+    localStorage.setItem("moneyBags", totalMoneyBags);
+    setMoneyBags((prev) => prev + sessionMoneyBags);
   };
 
   const toggleGemHistoryModal = () => {
@@ -105,6 +115,7 @@ export function useGameState() {
   return {
     coins,
     tickets,
+    moneyBags,
     gems,
     gemHistory,
     showGemHistory,
@@ -113,6 +124,7 @@ export function useGameState() {
     persistGems,
     persistCoins,
     persistTickets,
+    persistMoneyBags,
     toggleGemHistoryModal,
     unlockCard,
     lockCard,

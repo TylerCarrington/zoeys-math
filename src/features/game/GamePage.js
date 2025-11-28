@@ -8,6 +8,7 @@ export default function GamePage({
   setPage,
   coins,
   tickets,
+  moneyBags,
   gems,
   gemHistory,
   showGemHistory,
@@ -19,10 +20,10 @@ export default function GamePage({
   onSessionEnd,
   onCodeRedeem,
 }) {
-  const handleSessionEnd = (sessionCoins, sessionTickets) => {
+  const handleSessionEnd = (sessionCoins, sessionTickets, sessionMoneyBags) => {
     persistCoins(sessionCoins);
     persistTickets(sessionTickets);
-    onSessionEnd(sessionCoins, sessionTickets);
+    onSessionEnd(sessionCoins, sessionTickets, sessionMoneyBags);
   };
 
   return (
@@ -32,6 +33,7 @@ export default function GamePage({
         setPage={setPage}
         coins={coins}
         tickets={tickets}
+        moneyBags={moneyBags}
         gems={gems}
         toggleGemHistoryModal={toggleGemHistoryModal}
         sessionEndTrigger={sessionEndTrigger}

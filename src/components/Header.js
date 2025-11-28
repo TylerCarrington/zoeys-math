@@ -6,6 +6,7 @@ export default function Header({
   setPage,
   coins,
   tickets,
+  moneyBags,
   gems,
   toggleGemHistoryModal,
   sessionEndTrigger,
@@ -38,6 +39,7 @@ export default function Header({
 
         <span>🪙 {coins}</span>
         <span>🎟️ {tickets}</span>
+        <span>💰 {moneyBags}</span>
         <span
           onClick={toggleGemHistoryModal}
           style={{ cursor: "pointer", fontWeight: "bold" }}

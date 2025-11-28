@@ -54,6 +54,7 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
   ]);
   const [sessionCoins, setSessionCoins] = useState(0);
   const [sessionTickets, setSessionTickets] = useState(0);
+  const [sessionMoneyBags, setSessionMoneyBags] = useState(0);
   
   // Use ref to track if we've already called onSessionEnd for this session
   const sessionEndedRef = useRef(false);
@@ -65,16 +66,16 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
       interval = setInterval(() => setTimer((prev) => prev - 1), 1000);
     } else if (timer === 0 && isTimerRunning && !sessionEndedRef.current) {
       setFeedback(
-        `Time's up! Coins (🪙) earned: ${sessionCoins}, Tickets (🎟️) earned: ${sessionTickets}`
+        `Time's up! Coins (🪙) earned: ${sessionCoins}, Tickets (🎟️) earned: ${sessionTickets}, Money Bags (💰) earned: ${sessionMoneyBags}`
       );
 
-      onSessionEnd(sessionCoins, sessionTickets);
+      onSessionEnd(sessionCoins, sessionTickets, sessionMoneyBags);
       sessionEndedRef.current = true;
       setIsTimerRunning(false);
     }
 
     return () => clearInterval(interval);
-  }, [isTimerRunning, timer, sessionCoins, sessionTickets, onSessionEnd]);
+  }, [isTimerRunning, timer, sessionCoins, sessionTickets, sessionMoneyBags, onSessionEnd]);
 
   const startTimer = useCallback(() => {
     sessionEndedRef.current = false; // Reset the ref for new session
@@ -90,6 +91,7 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
     setIncorrectCount(0);
     setSessionCoins(0);
     setSessionTickets(0);
+    setSessionMoneyBags(0);
   }, [selectedOperators]);
 
   const handleAnswerChange = (e) => {
@@ -100,10 +102,20 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
     if (parseInt(userAnswer) === answer) {
       setFeedback("Correct!");
       setCorrectCount((prev) => prev + 1);
-      if (problem.includes("+") || problem.includes("-")) {
+      if (problem.includes("+")) {
+        // Addition: +1 coin
         setSessionCoins((prev) => prev + 1);
-      } else if (problem.includes("x") || problem.includes("÷")) {
+      } else if (problem.includes("-")) {
+        // Subtraction: +1 coin and +1 money bag
+        setSessionCoins((prev) => prev + 1);
+        setSessionMoneyBags((prev) => prev + 1);
+      } else if (problem.includes("x")) {
+        // Multiplication: +1 ticket
         setSessionTickets((prev) => prev + 1);
+      } else if (problem.includes("÷")) {
+        // Division: +1 ticket and +1 money bag
+        setSessionTickets((prev) => prev + 1);
+        setSessionMoneyBags((prev) => prev + 1);
       }
     } else {
       setFeedback(`Incorrect! The correct answer was: ${answer}`);
@@ -183,7 +195,9 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
 
           {/* Subtraction Toggle */}
           <div className="operator-group">
-            {"🪙"}
+            <div>
+              {"🪙"} {"💰"}
+            </div>
             <div>-</div>
             <label className="toggle-switch">
               <input
@@ -211,7 +225,9 @@ const MathTimer = ({ userName, onSessionEnd, setPage }) => {
 
           {/* Division Toggle */}
           <div className="operator-group">
-            {"🎟️"}
+            <div>
+              {"🎟️"} {"💰"}
+            </div>
             <div>÷</div>
             <label className="toggle-switch">
               <input

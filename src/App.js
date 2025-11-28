@@ -18,12 +18,14 @@ export default function App() {
     setPage("game");
   };
 
-  const handleSessionEnd = (sessionCoins, sessionTickets) => {
+  const handleSessionEnd = (sessionCoins, sessionTickets, sessionMoneyBags) => {
     gameState.persistCoins(sessionCoins);
     gameState.persistTickets(sessionTickets);
+    gameState.persistMoneyBags(sessionMoneyBags);
     setSessionEndTrigger({
       coins: sessionCoins,
       tickets: sessionTickets,
+      moneyBags: sessionMoneyBags,
       time: Date.now(),
     });
   };
@@ -51,6 +53,7 @@ export default function App() {
         setPage={setPage}
         coins={gameState.coins}
         tickets={gameState.tickets}
+        moneyBags={gameState.moneyBags}
         gems={gameState.gems}
         gemHistory={gameState.gemHistory}
         showGemHistory={gameState.showGemHistory}
@@ -72,6 +75,7 @@ export default function App() {
         setPage={setPage}
         coins={gameState.coins}
         tickets={gameState.tickets}
+        moneyBags={gameState.moneyBags}
         gems={gameState.gems}
         gemHistory={gameState.gemHistory}
         showGemHistory={gameState.showGemHistory}

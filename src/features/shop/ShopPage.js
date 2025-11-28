@@ -8,6 +8,7 @@ export default function ShopPage({
   setPage,
   coins,
   tickets,
+  moneyBags,
   gems,
   gemHistory,
   showGemHistory,
@@ -28,6 +29,7 @@ export default function ShopPage({
         setPage={setPage}
         coins={coins}
         tickets={tickets}
+        moneyBags={moneyBags}
         gems={gems}
         toggleGemHistoryModal={toggleGemHistoryModal}
         sessionEndTrigger={sessionEndTrigger}
